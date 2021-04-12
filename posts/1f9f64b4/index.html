@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="创建&#x2F;删除套接字 socket 1 2   #include  int socket(int domain, int type, int protocol);   socket()函数用来创建一个套接字。 返回一个指向该套接字的非负的套接字描述符，若失败则返回-1。 其参数： - domain：指定协议族，我们这里只关注两种，即AF_INET(IPV4)和AF_INET6(IPV6)，其中AF可替">
+<meta property="og:type" content="article">
+<meta property="og:title" content="socket编程基础知识">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/1f9f64b4/index.html">
+<meta property="og:site_name" content="uniform64&#39;s blog">
+<meta property="og:description" content="创建&#x2F;删除套接字 socket 1 2   #include  int socket(int domain, int type, int protocol);   socket()函数用来创建一个套接字。 返回一个指向该套接字的非负的套接字描述符，若失败则返回-1。 其参数： - domain：指定协议族，我们这里只关注两种，即AF_INET(IPV4)和AF_INET6(IPV6)，其中AF可替">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-06-05T05:34:56.000Z">
+<meta property="article:modified_time" content="2021-04-12T15:22:25.755Z">
+<meta property="article:author" content="uniform64">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="socket">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jyuniform64.github.io/posts/1f9f64b4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>socket编程基础知识 | uniform64's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">uniform64's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-film fa-fw"></i>读书</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-book fa-fw"></i>观影</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/1f9f64b4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="uniform64">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="uniform64's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          socket编程基础知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-05 13:34:56" itemprop="dateCreated datePublished" datetime="2020-06-05T13:34:56+08:00">2020-06-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-12 23:22:25" itemprop="dateModified" datetime="2021-04-12T23:22:25+08:00">2021-04-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E4%B8%8A/" itemprop="url" rel="index"><span itemprop="name">学习路上</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/1f9f64b4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/1f9f64b4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="创建删除套接字">创建/删除套接字</h2>
+<h3 id="socket">socket</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> domain, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>socket()函数用来创建一个套接字。 返回一个指向该套接字的非负的套接字描述符，若失败则返回-1。 其参数： - domain：指定协议族，我们这里只关注两种，即<code>AF_INET</code>(IPV4)和<code>AF_INET6</code>(IPV6)，其中<strong>AF</strong>可替换为<strong>PF</strong> - type：指定套接字类型，我们这里关注两种： - SOCK_STREAM：Provides sequenced, reliable, two-way connection-based byte streams. An out-of-band data transmissionmechanism may be supported.</p>
+<pre><code>-   SOCK_DGRAM  :    Supports datagrams (connectionless, unreliable messages of a fixed maximum length).</code></pre>
+<ul>
+<li>protocol:指定具体的端到端协议，我们关注的有<code>IPPROTO_TCP</code>、 <code>IPPROTO_UDP</code> ；0为对应type的默认协议。</li>
+</ul>
+<h3 id="close">close</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>close()函数用来关闭一个文件描述符，这里用来删除一个套接字。 成功则返回0，失败返回-1。 ## 地址信息结构 ### sockaddr <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span>  </span><br><span class="line">     <span class="keyword">sa_family_t</span> sin_family;<span class="comment">//地址族(e.g. AF_INET)</span></span><br><span class="line">　　  <span class="keyword">char</span> sa_data[<span class="number">14</span>]; <span class="comment">//与地址族种类相关，包含地址和端口信息              </span></span><br><span class="line">　　 &#125;; </span><br></pre></td></tr></table></figure> 这是一个通用的地址结构。</p>
+<h3 id="sockaddr_in">sockaddr_in</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> sa_family_t unsigned short int</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">uint32_t</span> <span class="keyword">in_addr_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="keyword">in_addr_t</span> s_addr;<span class="comment">//32 bits</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Structure describing an Internet socket address.  */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="keyword">sa_family_t</span> sin_family; <span class="comment">//AF_INET</span></span><br><span class="line">    <span class="keyword">in_port_t</span> sin_port;   <span class="comment">/* Port number. 16 bits */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>  <span class="comment">/* Internet address.  */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Pad to size of `struct sockaddr&#x27;.  */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> sin_zero[<span class="number">8</span>];</span><br><span class="line">   &#125;;   </span><br></pre></td></tr></table></figure>
+<p>储存 IPv4 套接字地址，是<code>sockaddr</code>的一个具体实现。在尾部填充字节从而达到与<code>sockaddr</code>大小相同的目的。因此指向<code>sockaddr_in</code>的一个指针可以cast成为指向<code>sockaddr</code>的指针。</p>
+<h3 id="sockaddr_in6">sockaddr_in6</h3>
+<p>储存 IPv6 套接字地址，与<code>sockaddr_in</code>结构相似，这里不做介绍。</p>
+<p>补充：<code>sockaddr_in6</code>结构体大小要大于<code>sockaddr</code>的大小，因此后者无法兼容前者。对于这个问题，有新的大小更大的结构体<code>sockaddr_storage</code> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_storage</span>&#123;</span></span><br><span class="line">    <span class="keyword">sa_family_t</span>;</span><br><span class="line">    ...</span><br><span class="line">    Padding <span class="keyword">and</span> fields to get correct length <span class="keyword">and</span> alignment.</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure> 代替<code>sockaddr</code>作为通用地址结构，这个结构可以兼容IPv6地址。</p>
+<h3 id="地址结构转换binarystring">地址结构转换（Binary/String）</h3>
+<h4 id="inet_pton">inet_pton</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">inet_pton</span><span class="params">(<span class="keyword">int</span> af, <span class="keyword">const</span> <span class="keyword">char</span> *src, <span class="keyword">void</span> *dst)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>convert IPv4 and IPv6 addresses from text to binary form.</strong></p>
+<p>This function converts the character string <code>src</code> into a network address structure in the <code>af</code> address family, then copies the network address structure to <code>dst</code>. The af argument must be either AF_INET or AF_INET6. <code>dst</code> is written in network byte order.</p>
+<p><code>src</code> points to a character string containing an IPv4 network address in dotted-decimal format, "ddd.ddd.ddd.ddd", where ddd is a decimal number of up to three digits in the range 0 to 255. The address is converted to a struct in_addr and copied to <code>dst</code>, which must be sizeof(struct <code>in_addr</code>) (4) bytes (32 bits) long.</p>
+<p>#### inet_ntop <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="title">inet_ntop</span><span class="params">(<span class="keyword">int</span> af, <span class="keyword">const</span> <span class="keyword">void</span> *src, <span class="keyword">char</span> *dst, <span class="keyword">socklen_t</span> size)</span></span>;</span><br></pre></td></tr></table></figure> <strong>convert IPv4 and IPv6 addresses from binary to text form</strong></p>
+<p>This function converts the network address structure <code>src</code> in the <code>af</code> address family into a character string. The resulting string is copied to the buffer pointed to by <code>dst</code>, which must be a non-null pointer. The caller specifies the number of bytes available in this buffer in the argument <code>size</code>.</p>
+<p><code>src</code> points to a struct in_addr (in network byte order) which is converted to an IPv4 network address in the dotted-decimal format, "ddd.ddd.ddd.ddd". The buffer <code>dst</code> must be at least <code>INET_ADDRSTRLEN</code> bytes long. ## 套接字初始连接--connect <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">const</span> struct sockaddr *foreignAddress, <span class="keyword">socklen_t</span> addrlen)</span></span>;</span><br></pre></td></tr></table></figure> 基于连接的协议（如TCP）的套接字使用<code>connect()</code>与和地址绑定的套接字进行连接。</p>
+<p>前两个参数在前文中均有介绍（见<strong>socket()</strong>与<strong>sockaddr</strong>），第三个参数为<code>struct sockaddr</code>的大小。</p>
+<p>若成功连接则返回0，否则返回-1。</p>
+<h2 id="绑定地址--bind">绑定地址--bind</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">const</span> struct sockaddr *localAddress, <span class="keyword">socklen_t</span> addrlen)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>该函数用来将套接字与特定的地址进行绑定。TCP/IP应用中，<code>sockaddr</code>总是指向<code>sockaddr_in</code>或者<code>sockaddr_in6</code> 。</p>
+<p>若成功连接则返回0，否则返回-1。</p>
+<p>bind()通常被server使用，但client也使用bind()指定本地地址/端口（TCP client的地址/端口在connect()时确定）。</p>
+<p><strong>注意：</strong> 必须使用<code>htonl()</code>将<code>localAddress</code>从host byte order转化为network byte order。</p>
+<h2 id="处理连接">处理连接</h2>
+<h3 id="listen">listen</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> queueLimit)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>listen()函数使得套接字成为被动套接字，监听客户端发送的连接请求，并将请求压入请求队列等待接受。<strong>listen()并不处理请求</strong>。</p>
+<p><code>queueLimit</code>指定了请求队列的最大长度，其最大值（128）由宏<code>SOMAXCONN</code>定义。若队列满时监听到请求，则返回error，或者在协议支持重传的情况下忽略该消息。</p>
+<p>若成功连接则返回0，否则返回-1。</p>
+<h3 id="accept">accept</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> sockfd, struct sockaddr *clientAddress, <span class="keyword">socklen_t</span> *addressLength)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>accept()</code>函数将连接请求出列并进行处理，如果请求队列为空则block直到新的请求到来。</p>
+<p>当成功处理请求时，accept()将客户端地址写入<code>clientAddress</code>指向的位置。参数<code>addressLength</code>表明了<code>clientAddress</code>指向的结构体的大小（或者说该处可用的空间）。注意到这个这个参数是指针的形式，它在调用结束后返回写入结构体的实际大小。如果<code>addressLength</code>标明的大小不够大，则<code>clientAddress</code>会被截断，同时<code>addressLength</code>返回一个大于调用时指定的值。因此<strong>注意在调用accept()前一定进行addressLength的初始化</strong>。</p>
+<p>当处理成功时，函数返回一个非负的套接字描述符。这个描述符指向的套接字与客户端建立了连接。当失败时返回-1。</p>
+<h2 id="交流">交流</h2>
+<h3 id="send">send</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">send</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> len, <span class="keyword">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>send()</code>函数用于<strong>连接状态的套接字</strong>发送数据。</p>
+<p>参数<code>flags</code>用于更改一些套接字调用的行为，<strong>0</strong>为默认行为。此处详见man。</p>
+<p>函数返回发送数据的大小（byte），若失败则返回-1。</p>
+<p>默认行为状态下，<code>send()</code>block直到所有数据发送完毕。</p>
+<h3 id="recv">recv</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">recv</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> len, <span class="keyword">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>recv()</code>函数用于接收另一个套接字发送的数据。注意这个套接字对连接性没有要求。</p>
+<p>默认行为下，<code>recv()</code>block直到一定量的数据被接收。</p>
+<p>其他说明参见<code>send()</code>。</p>
+<p><strong>注意：调用一次<code>recv()</code>接收到的数据长度并不取决于<code>send()</code>调用的次数或者是<code>buf</code>的大小</strong></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>uniform64
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jyuniform64.github.io/posts/1f9f64b4/" title="socket编程基础知识">https://jyuniform64.github.io/posts/1f9f64b4/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/socket/" rel="tag"># socket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/a5c1a8bd/" rel="prev" title="【C++】vector为何不用relloc">
+      <i class="fa fa-chevron-left"></i> 【C++】vector为何不用relloc
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/6e9b18e3/" rel="next" title="【OS】PCB与TSS">
+      【OS】PCB与TSS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%88%A0%E9%99%A4%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="nav-number">1.</span> <span class="nav-text">创建&#x2F;删除套接字</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket"><span class="nav-number">1.1.</span> <span class="nav-text">socket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close"><span class="nav-number">1.2.</span> <span class="nav-text">close</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sockaddr_in"><span class="nav-number">1.3.</span> <span class="nav-text">sockaddr_in</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sockaddr_in6"><span class="nav-number">1.4.</span> <span class="nav-text">sockaddr_in6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84%E8%BD%AC%E6%8D%A2binarystring"><span class="nav-number">1.5.</span> <span class="nav-text">地址结构转换（Binary&#x2F;String）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#inet_pton"><span class="nav-number">1.5.1.</span> <span class="nav-text">inet_pton</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E5%9C%B0%E5%9D%80--bind"><span class="nav-number">2.</span> <span class="nav-text">绑定地址--bind</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">处理连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#listen"><span class="nav-number">3.1.</span> <span class="nav-text">listen</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accept"><span class="nav-number">3.2.</span> <span class="nav-text">accept</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E6%B5%81"><span class="nav-number">4.</span> <span class="nav-text">交流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#send"><span class="nav-number">4.1.</span> <span class="nav-text">send</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recv"><span class="nav-number">4.2.</span> <span class="nav-text">recv</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="uniform64"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">uniform64</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JYuniform64" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JYuniform64" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jiny2048@gmail.com" title="E-Mail → mailto:jiny2048@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备20010232号 </a>
+      <img src="https://img.imgdb.cn/item/5e5a92ac6127cc071359d9fd.png" style="display: inline-block;"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011302002376" rel="noopener" target="_blank">粤公网安备 44011302002376号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">uniform64</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">47k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">43 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : '0betwlWUa9lqO4RehohBtxrL-MdYXbMMI',
+      appKey     : 'BEK6xsox1P9icK3mXrYx7b3j',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Exercise 7 1 2 3   Exercise 7. Use QEMU and GDB to trace into the JOS kernel and stop at the movl %eax, %cr0. Examine memory at 0x00100000 and at 0xf0100000. Now, single step over that instruction usi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【OS】mit6.828 Lab1">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/e59f0b2f/index.html">
+<meta property="og:site_name" content="uniform64&#39;s blog">
+<meta property="og:description" content="Exercise 7 1 2 3   Exercise 7. Use QEMU and GDB to trace into the JOS kernel and stop at the movl %eax, %cr0. Examine memory at 0x00100000 and at 0xf0100000. Now, single step over that instruction usi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pic.downk.cc/item/5f897fb61cd1bbb86b9ed2eb.png">
+<meta property="article:published_time" content="2020-10-15T13:09:42.000Z">
+<meta property="article:modified_time" content="2021-04-12T15:22:14.081Z">
+<meta property="article:author" content="uniform64">
+<meta property="article:tag" content="OS">
+<meta property="article:tag" content="6.828">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5f897fb61cd1bbb86b9ed2eb.png">
+
+<link rel="canonical" href="https://jyuniform64.github.io/posts/e59f0b2f/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【OS】mit6.828 Lab1 | uniform64's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">uniform64's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-film fa-fw"></i>读书</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-book fa-fw"></i>观影</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/e59f0b2f/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="uniform64">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="uniform64's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【OS】mit6.828 Lab1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-15 21:09:42" itemprop="dateCreated datePublished" datetime="2020-10-15T21:09:42+08:00">2020-10-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-12 23:22:14" itemprop="dateModified" datetime="2021-04-12T23:22:14+08:00">2021-04-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E4%B8%8A/" itemprop="url" rel="index"><span itemprop="name">学习路上</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/e59f0b2f/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/e59f0b2f/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="exercise-7">Exercise 7</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exercise 7. Use QEMU and GDB to trace into the JOS kernel and stop at the movl %eax, %cr0. Examine memory at 0x00100000 and at 0xf0100000. Now, single step over that instruction using the stepi GDB command. Again, examine memory at 0x00100000 and at 0xf0100000. Make sure you understand what just happened.</span><br><span class="line"></span><br><span class="line">What is the first instruction after the new mapping is established that would fail to work properly if the mapping weren&#39;t in place? Comment out the movl %eax, %cr0 in kern&#x2F;entry.S, trace into it, and see if you were right.</span><br></pre></td></tr></table></figure>
+<p>Here is some GDB record concerning the first question.</p>
+<pre>
+=&gt; <font color="#268BD2">0x100025</font>:    mov    %eax,%cr0Breakpoint 2, <font color="#268BD2">0x00100025</font> in <font color="#B58900">??</font> ()
+(gdb) x/10x 0x100000
+<font color="#268BD2">0x100000</font>:  0x1badb002  0x00000000  0xe4524ffe  0x7205c766
+<font color="#268BD2">0x100010</font>:  0x34000004  0x2000b812  0x220f0011  0xc0200fd8
+<font color="#268BD2">0x100020</font>:  0x0100010d  0xc0220f80
+(gdb) x/10x 0xf0100000
+<font color="#268BD2">0xf0100000</font> &lt;<font color="#B58900">_start</font>-268435468&gt;:  0x00000000  0x00000000  0x00000000  0x00000000
+<font color="#268BD2">0xf0100010</font> &lt;<font color="#B58900">entry</font>+4&gt;:   0x00000000  0x00000000  0x00000000  0x00000000
+<font color="#268BD2">0xf0100020</font> &lt;<font color="#B58900">entry</font>+20&gt;:  0x00000000  0x00000000
+(gdb) si
+=&gt; <font color="#268BD2">0x100028</font>:    mov    $0xf010002f,%eax
+<font color="#268BD2">0x00100028</font> in <font color="#B58900">??</font> ()
+(gdb) x/10x 0x100000
+<font color="#268BD2">0x100000</font>:  0x1badb002  0x00000000  0xe4524ffe  0x7205c766
+<font color="#268BD2">0x100010</font>:  0x34000004  0x2000b812  0x220f0011  0xc0200fd8
+<font color="#268BD2">0x100020</font>:  0x0100010d  0xc0220f80
+(gdb) x/10x 0xf0100000
+<font color="#268BD2">0xf0100000</font> &lt;<font color="#B58900">_start</font>-268435468&gt;:  0x1badb002  0x00000000  0xe4524ffe  0x7205c766
+<font color="#268BD2">0xf0100010</font> &lt;<font color="#B58900">entry</font>+4&gt;:   0x34000004  0x2000b812  0x220f0011  0xc0200fd8
+<font color="#268BD2">0xf0100020</font> &lt;<font color="#B58900">entry</font>+20&gt;:  0x0100010d  0xc0220f80
+</pre>
+<p>It's obvious that after instruction <code>movl %eax, %cr0</code>, address <code>0xf0100000</code> is mapped to <code>0x00100000</code>. Thus we can make a reasonable assumption that the instruction enables paging mechanism. Looking deep in function of reg <code>CR0</code></p>
+<p><img src="https://pic.downk.cc/item/5f897fb61cd1bbb86b9ed2eb.png" /></p>
+<p>and comparing it with the value of <code>CR0</code> <strong>10000000000000010000000000000001</strong>, we find OS now enables paging and write protect. Following is a brief introduction about Paging bit.</p>
+<blockquote>
+<p>Enables paging when set; disables paging when clear. When paging is disabled, all linear addresses are treated as physical addresses. The PG flag has no effect if the PE flag (bit 0 of register CR0) is not also set; setting the PG flag when the PE flag is clear causes a general-protection exception (#GP).</p>
+</blockquote>
+<p>Comment out the instruction, recompile the kernel and trace into it, we find it exits here:</p>
+<pre>=&gt; <font color="#268BD2">0x100028</font>:   jmp    *%eax
+<font color="#268BD2">0x00100028</font> in <font color="#B58900">??</font> ()
+(gdb) 
+=&gt; <font color="#268BD2">0xf010002a</font> &lt;<font color="#B58900">relocated</font>&gt;:   add    %al,(%eax)
+<font color="#B58900">relocated</font> () at <font color="#00FAFF">kern/entry.S</font>:74
+74      movl    $0x0,%ebp           # nuke frame pointer
+(gdb) si
+Remote connection closed
+</pre>
+<p>with qemu error information:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu: fatal: Trying to execute code outside RAM or ROM at 0xf010002a</span><br></pre></td></tr></table></figure>
+<h2 id="exercise-8">Exercise 8</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exercise 8. We have omitted a small fragment of code - the code necessary to print octal numbers using patterns of the form &quot;%o&quot;. Find and fill in this code fragment.</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in lab1/lib/printfmt.c</span></span><br><span class="line">    <span class="comment">// (unsigned) octal</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;o&#x27;</span>:</span><br><span class="line">    <span class="comment">// Replace this with your code.</span></span><br><span class="line">    num = getuint(&amp;ap, lflag);</span><br><span class="line">    base = <span class="number">8</span>;</span><br><span class="line">    <span class="keyword">goto</span> number;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// What is the purpose of this?</span></span><br><span class="line"><span class="keyword">if</span> (crt_pos &gt;= CRT_SIZE) &#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">    memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * <span class="keyword">sizeof</span>(<span class="keyword">uint16_t</span>));</span><br><span class="line">    <span class="keyword">for</span> (i = CRT_SIZE - CRT_COLS; i &lt; CRT_SIZE; i++)</span><br><span class="line">        crt_buf[i] = <span class="number">0x0700</span> | <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">    crt_pos -= CRT_COLS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">When the CGA display is full, lift all rows to make an available line at the end of the CGA.</span><br></pre></td></tr></table></figure>
+<h2 id="exercise-9">Exercise 9</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exercise 9. Determine where the kernel initializes its stack, and exactly where in memory its stack is located. How does the kernel reserve space for its stack? And at which &quot;end&quot; of this reserved area is the stack pointer initialized to point to?</span><br></pre></td></tr></table></figure>
+<pre>(gdb) x/20i 0xf010002f
+=&gt; <font color="#268BD2">0xf010002f</font> &lt;<font color="#B58900">relocated</font>&gt;:   mov    $0x0,%ebp
+   <font color="#268BD2">0xf0100034</font> &lt;<font color="#B58900">relocated</font>+5&gt;:    mov    $0xf0110000,%esp
+   <font color="#268BD2">0xf0100039</font> &lt;<font color="#B58900">relocated</font>+10&gt;:   call   <font color="#268BD2">0xf01000aa</font> &lt;<font color="#B58900">i386_init</font>&gt;
+</pre>
+<p>The kernel initializes its stack at <strong>0xf0100034</strong>, and the stack is located at <strong>0xf0110000</strong>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">relocated:</span><br><span class="line"></span><br><span class="line">        # Clear the frame pointer register (EBP)</span><br><span class="line">        # so that once we get into debugging C code,</span><br><span class="line">        # stack backtraces will be terminated properly.</span><br><span class="line">        movl    $0x0,%ebp                       # nuke frame pointer</span><br><span class="line"></span><br><span class="line">        # Set the stack pointer</span><br><span class="line">        movl    $(bootstacktop),%esp</span><br><span class="line"></span><br><span class="line">        # now to C code</span><br><span class="line">        call    i386_init</span><br><span class="line"></span><br><span class="line">        # Should never get here, but in case we do, just spin.</span><br><span class="line">spin:   jmp     spin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">###################################################################</span><br><span class="line"># boot stack</span><br><span class="line">###################################################################</span><br><span class="line">        .p2align        PGSHIFT         # force page alignment</span><br><span class="line">        .globl          bootstack</span><br><span class="line">bootstack:</span><br><span class="line">        .space          KSTKSIZE</span><br><span class="line">        .globl          bootstacktop</span><br><span class="line">bootstacktop: </span><br></pre></td></tr></table></figure>
+<p>In <code>lab1/kern/entry.S</code>, there is a more clear way describing the initialization of the kernel stack and the size of it. <code>KSTKSIZE</code>(4*<code>PAGESIZE</code> defined in <code>lab1/lib/memlayout.h</code> and <code>PAGESIZE=4096</code> defined in <code>lab1/lib/mmu.h</code>) space has been reserved for the stack. The stack pointer, of course, points the top of the stack, as shown in <code>bootstack</code> section.</p>
+<h2 id="exercise-10">Exercise 10</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exercise 10. To become familiar with the C calling conventions on the x86, find the address of the test_backtrace function in obj&#x2F;kern&#x2F;kernel.asm, set a breakpoint there, and examine what happens each time it gets called after the kernel starts. How many 32-bit words does each recursive nesting level of test_backtrace push on the stack, and what are those words?</span><br><span class="line"></span><br><span class="line">Note that, for this exercise to work properly, you should be using the patched version of QEMU available on the tools page or on Athena. Otherwise, you&#39;ll have to manually translate all breakpoint and memory addresses to linear addresses.</span><br></pre></td></tr></table></figure>
+<p>Here's corresponding output during calling the <code>test_backtrace</code> function.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">entering test_backtrace 5</span><br><span class="line">entering test_backtrace 4</span><br><span class="line">entering test_backtrace 3</span><br><span class="line">entering test_backtrace 2</span><br><span class="line">entering test_backtrace 1</span><br><span class="line">entering test_backtrace 0</span><br><span class="line">leaving test_backtrace 0</span><br><span class="line">leaving test_backtrace 1</span><br><span class="line">leaving test_backtrace 2</span><br><span class="line">leaving test_backtrace 3</span><br><span class="line">leaving test_backtrace 4</span><br><span class="line">leaving test_backtrace 5</span><br></pre></td></tr></table></figure>
+<p>Each time it gets called after the kernel starts, a corresponding stack frame is created. Here is a record when <code>test_backtrace</code> is called for the first time.</p>
+<pre>=&gt; <font color="#268BD2">0xf0100048</font> &lt;<font color="#B58900">test_backtrace</font>+8&gt;:   push   %ebx
+<font color="#268BD2">0xf0100048</font> in <font color="#B58900">test_backtrace</font> (<font color="#2AA198">x</font>=-267321352) at <font color="#00FAFF">kern/init.c</font>:13
+13  {
+Stack level 0, frame at 0xf010ffd8:
+ eip = 0xf0100048 in test_backtrace (<font color="#00FAFF">kern/init.c</font>:13); saved eip = 0x10094
+ called by frame at 0xf010ffe0
+ source language c.
+ Arglist at 0xf010ffd0, args: <font color="#2AA198">x</font>=-267321352
+ Locals at 0xf010ffd0, Previous frame&apos;s sp is 0xf010ffd8
+ Saved registers:
+  eip at 0xf010ffd4
+eax            0x0                 0
+ecx            0x3d4               980
+edx            0x3d5               981
+ebx            0xf0111308          -267316472
+esp            0xf010ffd4          0xf010ffd4
+ebp            0xf010ffd8          0xf010ffd8
+esi            0x10094             65684
+edi            0x0                 0
+eip            0xf0100048          0xf0100048 &lt;test_backtrace+8&gt;
+eflags         0x46                [ PF ZF ]
+cs             0x8                 8
+ss             0x10                16
+ds             0x10                16
+es             0x10                16
+fs             0x10                16
+gs             0x10                16
+</pre>
+<p>The address stack pointer(%esp) pointing changes during the function call, and here is the structure of the frame.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">           ^           +-------------+ </span><br><span class="line"> high addr.|           | arg. list   | </span><br><span class="line">           |           +-------------+ </span><br><span class="line">           |           | reutrn addr.| </span><br><span class="line">           |           +-------------+                                 </span><br><span class="line">           |           | old ebp     |</span><br><span class="line">           |  ebp---&gt;  +-------------+\</span><br><span class="line">           |           |  esi        | |</span><br><span class="line">           |           +-------------+ | reserved registers (0x8 bytes)</span><br><span class="line">           |           |  ebx        | |</span><br><span class="line">           |           +-------------+&#x2F;</span><br><span class="line">low addr.  |           | other data  |</span><br><span class="line">           |           +-------------+</span><br></pre></td></tr></table></figure>
+<p>In <code>lab1/obj/kern/kern.asm</code> we observe that <code>add $0x10,%esp</code> appears after each function call inside <code>test_backtrace</code>, which indicates that the space of the (local vars. + other data) = 0x10 bytes. Actually, in <code>test_backtrace</code> there is no <code>local vars.</code>, and <code>other data</code> = <code>arg. list</code>+<code>return addr.</code> of a calling function (<code>cprintf</code> for example).</p>
+<p>Back to the question, <code>test_backtrace</code> pushes many 32-bit words each recursive nesting level of on the stack. I say <strong>many</strong> because counting is meaningless for me after understanding the structure of the stack frame.</p>
+<h2 id="exercise-11">Exercise 11</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exercise 11. Implement the backtrace function as specified above. Use the same format as in the example, since otherwise the grading script will be confused. When you think you have it working right, run make grade to see if its output conforms to what our grading script expects, and fix it if it doesn&#39;t. After you have handed in your Lab 1 code, you are welcome to change the output format of the backtrace function any way you like.</span><br><span class="line"></span><br><span class="line">If you use read_ebp(), note that GCC may generate &quot;optimized&quot; code that calls read_ebp() before mon_backtrace()&#39;s function prologue, which results in an incomplete stack trace (the stack frame of the most recent function call is missing). While we have tried to disable optimizations that cause this reordering, you may want to examine the assembly of mon_backtrace() and make sure the call to read_ebp() is happening after the function prologue.</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">mon_backtrace(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv, struct Trapframe *tf)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="comment">// Your code here.</span></span><br><span class="line">        cprintf(<span class="string">&quot;Stack backtrace:\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">uint32_t</span> ebp = read_ebp();</span><br><span class="line">        <span class="keyword">while</span> (ebp != <span class="number">0</span>) &#123;</span><br><span class="line">                cprintf(<span class="string">&quot;ebp %08x  &quot;</span>, ebp);</span><br><span class="line">                cprintf(<span class="string">&quot;eip %08x  &quot;</span>, *((<span class="keyword">uint32_t</span> *)ebp + <span class="number">1</span>));</span><br><span class="line">                cprintf(<span class="string">&quot;args  &quot;</span>);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">                        cprintf(<span class="string">&quot;%08x &quot;</span>, *((<span class="keyword">uint32_t</span> *)ebp + <span class="number">2</span> + i));</span><br><span class="line">                cprintf(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">                ebp = *((<span class="keyword">uint32_t</span> *)ebp);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="exercise-12">Exercise 12</h2>
+<p><strong>Exercise 12.</strong> Modify your stack backtrace function to display, for each <code>eip</code>, the function name, source file name, and line number corresponding to that <code>eip</code>.</p>
+<p>In <code>debuginfo_eip</code>, where do <code>__STAB_*</code> come from? This question has a long answer; to help you to discover the answer, here are some things you might want to do:</p>
+<ul>
+<li>look in the file <code>kern/kernel.ld</code> for <code>__STAB_*</code></li>
+<li>run objdump -h obj/kern/kernel</li>
+<li>run objdump -G obj/kern/kernel</li>
+<li>run gcc -pipe -nostdinc -O2 -fno-builtin -I. -MD -Wall -Wno-format -DJOS_KERNEL -gstabs -c -S kern/init.c, and look at init.s.</li>
+<li>see if the bootloader loads the symbol table in memory as part of loading the kernel binary</li>
+</ul>
+<p>Complete the implementation of <code>debuginfo_eip</code> by inserting the call to <code>stab_binsearch</code> to find the line number for an address.</p>
+<p>Add a <code>backtrace</code> command to the kernel monitor, and extend your implementation of <code>mon_backtrace</code> to call <code>debuginfo_eip</code> and print a line for each stack frame of the form:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">K&gt; backtrace</span><br><span class="line">Stack backtrace:</span><br><span class="line">  ebp f010ff78  eip f01008ae  args 00000001 f010ff8c 00000000 f0110580 00000000</span><br><span class="line">         kern&#x2F;monitor.c:143: monitor+106</span><br><span class="line">  ebp f010ffd8  eip f0100193  args 00000000 00001aac 00000660 00000000 00000000</span><br><span class="line">         kern&#x2F;init.c:49: i386_init+59</span><br><span class="line">  ebp f010fff8  eip f010003d  args 00000000 00000000 0000ffff 10cf9a00 0000ffff</span><br><span class="line">         kern&#x2F;entry.S:70: &lt;unknown&gt;+0</span><br><span class="line">K&gt; </span><br></pre></td></tr></table></figure>
+<p>Each line gives the file name and line within that file of the stack frame's <code>eip</code>, followed by the name of the function and the offset of the <code>eip</code> from the first instruction of the function (e.g., <code>monitor+106</code> means the return <code>eip</code> is 106 bytes past the beginning of <code>monitor</code>).</p>
+<p>Be sure to print the file and function names on a separate line, to avoid confusing the grading script.</p>
+<p>Tip: printf format strings provide an easy, albeit obscure, way to print non-null-terminated strings like those in STABS tables. <code>printf("%.*s", length, string)</code> prints at most <code>length</code> characters of <code>string</code>. Take a look at the printf man page to find out why this works.</p>
+<p>You may find that some functions are missing from the backtrace. For example, you will probably see a call to <code>monitor()</code> but not to <code>runcmd()</code>. This is because the compiler in-lines some function calls. Other optimizations may cause you to see unexpected line numbers. If you get rid of the <code>-O2</code> from <code>GNUMakefile</code>, the backtraces may make more sense (but your kernel will run more slowly).</p>
+<hr />
+<p>There are three tasks in summary:</p>
+<ul>
+<li>Complete the implementation of <code>debuginfo_eip</code></li>
+<li>Modify <code>test_backtrace</code> to meet requirements</li>
+<li>Add command <strong>backtrace</strong> to call <code>test_backtrace</code></li>
+</ul>
+<p>As for the first one, only a small piece of code with simple logic needs to be added, which is shown as follow.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Search within [lline, rline] for the line number stab.</span></span><br><span class="line"><span class="comment">// If found, set info-&gt;eip_line to the right line number.</span></span><br><span class="line"><span class="comment">// If not found, return -1.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Hint:</span></span><br><span class="line"><span class="comment">//      There&#x27;s a particular stabs type used for line numbers.</span></span><br><span class="line"><span class="comment">//      Look at the STABS documentation and &lt;inc/stab.h&gt; to find</span></span><br><span class="line"><span class="comment">//      which one.</span></span><br><span class="line"><span class="comment">// Your code here.</span></span><br><span class="line">stab_binsearch(stabs, &amp;lline, &amp;rline, N_SLINE, addr);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(lline &lt;= rline) &#123;</span><br><span class="line">        info-&gt;eip_line = stabs[lline].n_desc;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>The completed <code>debuginfo_eip</code> is now used to modify function <code>test_traceback</code>.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">mon_backtrace(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv, struct Trapframe *tf)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="comment">// Your code here.</span></span><br><span class="line">        cprintf(<span class="string">&quot;Stack backtrace:\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">uint32_t</span> ebp = read_ebp();</span><br><span class="line">        <span class="keyword">while</span> (ebp != <span class="number">0</span>) &#123;</span><br><span class="line">                cprintf(<span class="string">&quot;ebp %08x  &quot;</span>, ebp);</span><br><span class="line">                cprintf(<span class="string">&quot;eip %08x  &quot;</span>, *((<span class="keyword">uint32_t</span> *)ebp + <span class="number">1</span>));</span><br><span class="line">                cprintf(<span class="string">&quot;args  &quot;</span>);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">                        cprintf(<span class="string">&quot;%08x &quot;</span>, *((<span class="keyword">uint32_t</span> *)ebp + <span class="number">2</span> + i));</span><br><span class="line">                cprintf(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">                <span class="class"><span class="keyword">struct</span> <span class="title">Eipdebuginfo</span> <span class="title">info</span>;</span></span><br><span class="line">                debuginfo_eip(*((<span class="keyword">uint32_t</span> *)ebp + <span class="number">1</span>), &amp;info);</span><br><span class="line">                cprintf(<span class="string">&quot;test eip_fn_name:%s\n&quot;</span>, info.eip_fn_name);</span><br><span class="line">                cprintf(<span class="string">&quot;       %s:%d: %.*s+%d\n&quot;</span>, info.eip_file, info.eip_line,</span><br><span class="line">                        info.eip_fn_namelen, info.eip_fn_name,</span><br><span class="line">                        *((<span class="keyword">uint32_t</span> *)ebp + <span class="number">1</span>) - info.eip_fn_addr);</span><br><span class="line">                        </span><br><span class="line">                ebp = *((<span class="keyword">uint32_t</span> *)ebp);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note that a tip mentioned above should be used to control the length of <code>eip_fn_name</code>.</p>
+<p>To complete the third task, a struct about backtrace should be added into command list.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">Command</span> <span class="title">commands</span>[] =</span> &#123;</span><br><span class="line">        &#123; <span class="string">&quot;help&quot;</span>, <span class="string">&quot;Display this list of commands&quot;</span>, mon_help &#125;,</span><br><span class="line">        &#123; <span class="string">&quot;kerninfo&quot;</span>, <span class="string">&quot;Display information about the kernel&quot;</span>, mon_kerninfo &#125;,</span><br><span class="line">        &#123; <span class="string">&quot;backtrace&quot;</span>, <span class="string">&quot;Display stack frame backtrace&quot;</span>, mon_backtrace &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>uniform64
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jyuniform64.github.io/posts/e59f0b2f/" title="【OS】mit6.828 Lab1">https://jyuniform64.github.io/posts/e59f0b2f/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OS/" rel="tag"># OS</a>
+              <a href="/tags/6-828/" rel="tag"># 6.828</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/321fbfac/" rel="prev" title="【网络安全】ARP欺骗">
+      <i class="fa fa-chevron-left"></i> 【网络安全】ARP欺骗
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/58ed48c1/" rel="next" title="【密码学】RSA密码体制（一）">
+      【密码学】RSA密码体制（一） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-7"><span class="nav-number">1.</span> <span class="nav-text">Exercise 7</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-8"><span class="nav-number">2.</span> <span class="nav-text">Exercise 8</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-9"><span class="nav-number">3.</span> <span class="nav-text">Exercise 9</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-10"><span class="nav-number">4.</span> <span class="nav-text">Exercise 10</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-11"><span class="nav-number">5.</span> <span class="nav-text">Exercise 11</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exercise-12"><span class="nav-number">6.</span> <span class="nav-text">Exercise 12</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="uniform64"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">uniform64</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JYuniform64" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JYuniform64" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jiny2048@gmail.com" title="E-Mail → mailto:jiny2048@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备20010232号 </a>
+      <img src="https://img.imgdb.cn/item/5e5a92ac6127cc071359d9fd.png" style="display: inline-block;"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011302002376" rel="noopener" target="_blank">粤公网安备 44011302002376号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">uniform64</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">47k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">43 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : '0betwlWUa9lqO4RehohBtxrL-MdYXbMMI',
+      appKey     : 'BEK6xsox1P9icK3mXrYx7b3j',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>

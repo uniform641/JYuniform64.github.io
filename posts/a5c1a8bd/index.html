@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言 昨天刷知乎看到一个有意思的问题，大意是 &gt;C++STL中 vector的push_back()扩容机制为什么不考虑使用C语言的自带函数realloc()实现？  对于一个手动实现过vector的人 （抄的），还是对vector有一定了解的。vector的内存管理使用的是STL中的allocator，而其一种扩容机制是当size &gt; capacity时vector通过allocator申请大小">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【C++】vector为何不用relloc">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/a5c1a8bd/index.html">
+<meta property="og:site_name" content="uniform64&#39;s blog">
+<meta property="og:description" content="前言 昨天刷知乎看到一个有意思的问题，大意是 &gt;C++STL中 vector的push_back()扩容机制为什么不考虑使用C语言的自带函数realloc()实现？  对于一个手动实现过vector的人 （抄的），还是对vector有一定了解的。vector的内存管理使用的是STL中的allocator，而其一种扩容机制是当size &gt; capacity时vector通过allocator申请大小">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pic.downk.cc/item/5e8b7058504f4bcb047e340d.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5e8b705a504f4bcb047e35dc.png">
+<meta property="article:published_time" content="2020-04-06T18:45:56.000Z">
+<meta property="article:modified_time" content="2021-04-12T15:21:53.184Z">
+<meta property="article:author" content="uniform64">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="STL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5e8b7058504f4bcb047e340d.png">
+
+<link rel="canonical" href="https://jyuniform64.github.io/posts/a5c1a8bd/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【C++】vector为何不用relloc | uniform64's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">uniform64's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-film fa-fw"></i>读书</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-book fa-fw"></i>观影</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/a5c1a8bd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="uniform64">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="uniform64's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【C++】vector为何不用relloc
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-07 02:45:56" itemprop="dateCreated datePublished" datetime="2020-04-07T02:45:56+08:00">2020-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-12 23:21:53" itemprop="dateModified" datetime="2021-04-12T23:21:53+08:00">2021-04-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E4%B8%8A/" itemprop="url" rel="index"><span itemprop="name">学习路上</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/a5c1a8bd/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/a5c1a8bd/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言">前言</h2>
+<p>昨天刷知乎看到一个有意思的问题，大意是 &gt;C++STL中 vector的push_back()扩容机制为什么不考虑使用C语言的自带函数realloc()实现？</p>
+<p>对于一个手动实现过vector的人 <del>（抄的）</del>，还是对vector有一定了解的。vector的内存管理使用的是STL中的<code>allocator</code>，而其一种扩容机制是当<code>size &gt; capacity</code>时vector通过<code>allocator</code>申请大小为<code>2*capacity</code>的空间，并将当前数据拷贝到新申请的空间中。说来惭愧，我一直对malloc()家族的实现没有深入了解过，那就现查一下。</p>
+<p><strong><a target="_blank" rel="noopener" href="http://cplusplus.com/reference/cstdlib/realloc/?kw=realloc">Reallocate memory block</a></strong> <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">realloc</span> <span class="params">(<span class="keyword">void</span>* ptr, <span class="keyword">size_t</span> size)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Changes the size of the memory block pointed to by ptr.</p>
+<p>The function may move the memory block to a new location (whose address is returned by the function).</p>
+<p>The content of the memory block is preserved up to the lesser of the new and old sizes, even if the block is moved to a new location. If the new size is larger, the value of the newly allocated portion is indeterminate.</p>
+<p>In case that ptr is a null pointer, the function behaves like malloc, assigning a new block of size bytes and returning a pointer to its beginning.</p>
+<p>If size is zero, the return value depends on the particular library implementation: it may either be a null pointer or some other location that shall not be dereferenced.</p>
+<p>If the function fails to allocate the requested block of memory, a null pointer is returned, and the memory block pointed to by argument ptr is not deallocated (it is still valid, and with its contents unchanged).</p>
+</blockquote>
+<p>我来简单分析一下。就单纯实现而言，vector的确可以只使用realloc()实现，下面是一个极简版本 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">vector</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">    T* begin;</span><br><span class="line">    T* end;</span><br><span class="line">    <span class="keyword">size_t</span> size;</span><br><span class="line">    <span class="keyword">size_t</span> capacity;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(<span class="keyword">const</span> T&amp; x)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size==capacity)</span><br><span class="line">            begin = <span class="built_in">realloc</span>(begin,(capacity+<span class="number">1</span>)*<span class="built_in"><span class="keyword">sizeof</span></span>(T));</span><br><span class="line">        capacity++;</span><br><span class="line">        end = begin + size;</span><br><span class="line">        *end = x;</span><br><span class="line">        end++;</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>那么显然，在<code>size==capacity</code>时不断地push_back会不停地调用<code>realloc()</code>，即使每次realloc()调用时在vector尾部都有足够的空间可以直接分配，其效率肯定较一次性设置<code>capacity=2*capacity</code>低。那如果改进一下，将realloc()参数中的size由<code>capacity+1</code>变为更大的值，比如<code>2*capacity</code>，它的情况会不会比原先使用allocator效率高呢？毕竟realloc()的空间是有可能在尾部直接分配的啊 。。。</p>
+<h2 id="triviallycopyable">TriviallyCopyable</h2>
+<p>为什么这里会出现<code>TriviallyCopyable</code>这个东西呢？<del>其实我也不知道</del> <strong>可平凡复制</strong>的要求如下 &gt;- 每个复制构造函数均为平凡或弃置的 &gt;- 每个移动构造函数均为平凡或弃置的 &gt;- 每个复制赋值运算符均为平凡或弃置的 &gt;- 每个移动赋值运算符均为平凡或弃置的 &gt;- 至少一个复制构造函数、移动构造函数、复制赋值运算符或移动赋值运算符未弃置 &gt;- 平凡而未弃置的析构函数 &gt;这意味着该类没有虚函数或虚基类。 &gt;标量类型和可平凡复制 (TriviallyCopyable) 对象的数组也是可平凡复制 (TriviallyCopyable) 的。</p>
+<p>我们再来看看其中<strong>平凡复制构造函数</strong>的要求 &gt;- 它不是用户提供的（即它是隐式定义或预置的），且若它被预置，则其签名与隐式定义的相同 (C++14 前)； &gt;- T 没有虚成员函数； &gt;- T 没有虚基类； &gt;- 为 T 的每个直接基类选择的复制构造函数都是平凡的； &gt;- 为 T 的每个类类型（或类类型数组）的非静态成员选择的复制构造函数都是平凡的；</p>
+<p>这和vector有什么关系呢？如果使用使用realloc()为其push_back扩容，让我们来看看realloc()的具体实现。emmm代码有点长，节选自<code>glibc/malloc.c</code> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *</span><br><span class="line">__libc_realloc (<span class="keyword">void</span> *oldmem, <span class="keyword">size_t</span> bytes)</span><br><span class="line">&#123;</span><br><span class="line">  mstate ar_ptr;</span><br><span class="line">  INTERNAL_SIZE_T nb;         <span class="comment">/* padded request size */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> *newp;             <span class="comment">/* chunk to return */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> *(*hook) (<span class="keyword">void</span> *, <span class="keyword">size_t</span>, <span class="keyword">const</span> <span class="keyword">void</span> *) =</span><br><span class="line">    atomic_forced_read (__realloc_hook);</span><br><span class="line">  <span class="keyword">if</span> (__builtin_expect (hook != <span class="literal">NULL</span>, <span class="number">0</span>))</span><br><span class="line">    <span class="keyword">return</span> (*hook)(oldmem, bytes, RETURN_ADDRESS (<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> REALLOC_ZERO_BYTES_FREES</span></span><br><span class="line">  <span class="keyword">if</span> (bytes == <span class="number">0</span> &amp;&amp; oldmem != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      __libc_free (oldmem); <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* realloc of null is supposed to be same as malloc */</span></span><br><span class="line">  <span class="keyword">if</span> (oldmem == <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> __libc_malloc (bytes);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* chunk corresponding to oldmem */</span></span><br><span class="line">  <span class="keyword">const</span> mchunkptr oldp = mem2chunk (oldmem);</span><br><span class="line">  <span class="comment">/* its size */</span></span><br><span class="line">  <span class="keyword">const</span> INTERNAL_SIZE_T oldsize = chunksize (oldp);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (chunk_is_mmapped (oldp))</span><br><span class="line">    ar_ptr = <span class="literal">NULL</span>;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      MAYBE_INIT_TCACHE ();</span><br><span class="line">      ar_ptr = arena_for_chunk (oldp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Little security check which won&#x27;t hurt performance: the allocator</span></span><br><span class="line"><span class="comment">     never wrapps around at the end of the address space.  Therefore</span></span><br><span class="line"><span class="comment">     we can exclude some size values which might appear here by</span></span><br><span class="line"><span class="comment">     accident or by &quot;design&quot; from some intruder.  We need to bypass</span></span><br><span class="line"><span class="comment">     this check for dumped fake mmap chunks from the old main arena</span></span><br><span class="line"><span class="comment">     because the new malloc may provide additional alignment.  */</span></span><br><span class="line">  <span class="keyword">if</span> ((__builtin_expect ((<span class="keyword">uintptr_t</span>) oldp &gt; (<span class="keyword">uintptr_t</span>) -oldsize, <span class="number">0</span>)</span><br><span class="line">       || __builtin_expect (misaligned_chunk (oldp), <span class="number">0</span>))</span><br><span class="line">      &amp;&amp; !DUMPED_MAIN_ARENA_CHUNK (oldp))</span><br><span class="line">      malloc_printerr (<span class="string">&quot;realloc(): invalid pointer&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!checked_request2size (bytes, &amp;nb))</span><br><span class="line">    &#123;</span><br><span class="line">      __set_errno (ENOMEM);</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (chunk_is_mmapped (oldp))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* If this is a faked mmapped chunk from the dumped main arena,</span></span><br><span class="line"><span class="comment">	 always make a copy (and do not free the old chunk).  */</span></span><br><span class="line">      <span class="keyword">if</span> (DUMPED_MAIN_ARENA_CHUNK (oldp))</span><br><span class="line">	&#123;</span><br><span class="line">	  <span class="comment">/* Must alloc, copy, free. */</span></span><br><span class="line">	  <span class="keyword">void</span> *newmem = __libc_malloc (bytes);</span><br><span class="line">	  <span class="keyword">if</span> (newmem == <span class="number">0</span>)</span><br><span class="line">	    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">	  <span class="comment">/* Copy as many bytes as are available from the old chunk</span></span><br><span class="line"><span class="comment">	     and fit into the new size.  NB: The overhead for faked</span></span><br><span class="line"><span class="comment">	     mmapped chunks is only SIZE_SZ, not 2 * SIZE_SZ as for</span></span><br><span class="line"><span class="comment">	     regular mmapped chunks.  */</span></span><br><span class="line">	  <span class="keyword">if</span> (bytes &gt; oldsize - SIZE_SZ)</span><br><span class="line">	    bytes = oldsize - SIZE_SZ;</span><br><span class="line">	  <span class="built_in">memcpy</span> (newmem, oldmem, bytes);</span><br><span class="line">	  <span class="keyword">return</span> newmem;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">void</span> *newmem;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> HAVE_MREMAP</span></span><br><span class="line">      newp = mremap_chunk (oldp, nb);</span><br><span class="line">      <span class="keyword">if</span> (newp)</span><br><span class="line">        <span class="keyword">return</span> chunk2mem (newp);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      <span class="comment">/* Note the extra SIZE_SZ overhead. */</span></span><br><span class="line">      <span class="keyword">if</span> (oldsize - SIZE_SZ &gt;= nb)</span><br><span class="line">        <span class="keyword">return</span> oldmem;                         <span class="comment">/* do nothing */</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">/* Must alloc, copy, free. */</span></span><br><span class="line">      newmem = __libc_malloc (bytes);</span><br><span class="line">      <span class="keyword">if</span> (newmem == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;              <span class="comment">/* propagate failure */</span></span><br><span class="line"></span><br><span class="line">      <span class="built_in">memcpy</span> (newmem, oldmem, oldsize - <span class="number">2</span> * SIZE_SZ);</span><br><span class="line">      munmap_chunk (oldp);</span><br><span class="line">      <span class="keyword">return</span> newmem;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (SINGLE_THREAD_P)</span><br><span class="line">    &#123;</span><br><span class="line">      newp = _int_realloc (ar_ptr, oldp, oldsize, nb);</span><br><span class="line">      assert (!newp || chunk_is_mmapped (mem2chunk (newp)) ||</span><br><span class="line">	      ar_ptr == arena_for_chunk (mem2chunk (newp)));</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> newp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  __libc_lock_lock (ar_ptr-&gt;mutex);</span><br><span class="line"></span><br><span class="line">  newp = _int_realloc (ar_ptr, oldp, oldsize, nb);</span><br><span class="line"></span><br><span class="line">  __libc_lock_unlock (ar_ptr-&gt;mutex);</span><br><span class="line">  assert (!newp || chunk_is_mmapped (mem2chunk (newp)) ||</span><br><span class="line">          ar_ptr == arena_for_chunk (mem2chunk (newp)));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (newp == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* Try harder to allocate memory in other arenas.  */</span></span><br><span class="line">      LIBC_PROBE (memory_realloc_retry, <span class="number">2</span>, bytes, oldmem);</span><br><span class="line">      newp = __libc_malloc (bytes);</span><br><span class="line">      <span class="keyword">if</span> (newp != <span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">memcpy</span> (newp, oldmem, oldsize - SIZE_SZ);</span><br><span class="line">          _int_free (ar_ptr, oldp, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> newp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> 可见当其不能进行原地扩充时，使用<code>memcpy()</code>函数申请新的内存空间，而memcpy()有如下要求： &gt;若对象潜在重叠或不可平凡复制 (TriviallyCopyable) ，则 memcpy 的行为未指定而且可能未定义</p>
+<p>vector中存在<strong>非平凡拷贝/移动构造函数</strong>，故使用realloc()扩展内存是有问题的，尤其对于一些存在引用自身的类型如<code>std::string</code>，在拷贝的时候很可能会出错。</p>
+<h2 id="allocator-vs-realloc">allocator VS realloc()</h2>
+<p>抛开上文所述的<em>可平凡复制</em>不谈，我们假设存在一些情况使得realloc()可以在vector中正常工作（事实上确实存在，此处不做深入讨论），那么vector实现所使用的空间配置器和这里讨论的realloc()函数有什么差别呢？</p>
+<h3 id="配置器allocator">配置器(allocator)</h3>
+<p>配置器：负责空间配置与管理，从实现的角度来看，配置器是一个实现了动态空间配置、空间管理、空间释放的 class template。</p>
+<p>空间配置器：整个 STL 的操作对象(所有的数值)都存放在容器之内，而容器一定需要配置空间以存放内容。</p>
+<p><img src="https://pic.downk.cc/item/5e8b7058504f4bcb047e340d.png" /></p>
+<h3 id="具有次配置力sub-allocation的-sgi-空间配置器">具有次配置力(sub-allocation)的 SGI 空间配置器</h3>
+<h4 id="sgi-stl-空间配置器的结构">SGI STL 空间配置器的结构</h4>
+<p>SGI STL 的配置器，其名称是 alloc 而不是 allocator，而且不接受任何参数。</p>
+<p>SGI STL 的每一个容器都已经指定其缺省的空间配置器为 alloc。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="keyword">class</span> <span class="title">Alloc</span> =</span> alloc&gt;  <span class="comment">// 缺省使用 alloc 为配置器</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">vector</span> &#123;</span>...&#125;;</span><br><span class="line"></span><br><span class="line">vector&lt;<span class="keyword">int</span>, std::alloc&gt; iv; </span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>&lt;defalloc.h&gt;----SGI 标准的空间配置器，std::allocator</p>
+<p>allocator 只是基层内存配置/释放行为(::operator::new 和 ::operator::delete)的一层薄薄的包装，并没有考虑到任何效率上的强化。</p></li>
+<li><p>SGI 特殊的空间配置器，std::alloc</p>
+<ul>
+<li>&lt;stl_construct.h&gt;：定义了全局函数 construct() 和 destroy()，负责对象的构造和析构。</li>
+<li>&lt;stl_alloc.h&gt;：定义了一、二级配置器，配置器名为 alloc。</li>
+<li>&lt;stl_uninitialized.h&gt;：定义了全局函数，用来填充(fill)或复制(copy)大块内存数据。</li>
+</ul></li>
+<li><p>构造和析构基本工具</p>
+<p>具体看 &lt;stl_construct.h&gt; 源码，功能是构造和析构操作。</p></li>
+<li><p>空间的配置和释放，std::alloc</p>
+<ul>
+<li>向 system heap 要求空间</li>
+<li>考虑多线程(multi-threads)状态</li>
+<li>考虑内存不足时的应变措施</li>
+<li>考虑过多 “小型区块” 可能造成的内存碎片问题</li>
+</ul>
+<p>对象构造前的空间配置 和 对象析构后的空间释放，具体看 &lt;stl_alloc.h&gt;。</p></li>
+</ul>
+<h4 id="sgi-stl-空间配置器的分析">SGI STL 空间配置器的分析</h4>
+<p>考虑到小型区块可能造成内存碎片问题，SGI 采用两级配置器，第一级配置器直接使用 malloc() 和 free() 实现；第二级配置器使用 memory pool 内存池管理。</p>
+<p>第二级配置器的原理：</p>
+<ul>
+<li>当配置区块超过 128 bytes，就使用第一级配置器</li>
+<li>当配置区块小于 128 bytes，使用内存池管理</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span>_ALIGN = <span class="number">8</span>&#125;;  <span class="comment">// 小型区块的上调边界</span></span><br><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span>_MAX_BYTES = <span class="number">128</span>&#125;; <span class="comment">// 小区区块的上限</span></span><br><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span>_NFREELISTS = <span class="number">16</span>&#125;; <span class="comment">// _MAX_BYTES/_ALIGN  free-list 的个数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// free-list 的节点结构，降低维护链表 list 带来的额外负担</span></span><br><span class="line"><span class="class"><span class="keyword">union</span> _<span class="title">Obj</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> _<span class="title">Obj</span>* _<span class="title">M_free_list_link</span>;</span>  <span class="comment">// 利用联合体特点</span></span><br><span class="line">    <span class="keyword">char</span> _M_client_data[<span class="number">1</span>];    <span class="comment">/* The client sees this. */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">static</span> _Obj* __STL_VOLATILE _S_free_list[_NFREELISTS];  <span class="comment">// 注意，它是数组，每个数组元素包含若干相等的小额区块</span></span><br></pre></td></tr></table></figure>
+<p>其中 free-list 是指针数组，16 个数组元素，就是 16 个 free-list，各自管理大小分别为 8， 16， 24， 32，...128 bytes(8 的倍数)的小额区块。</p>
+<p>小额区块的结构体 <code>union _Obj</code> 使用链表连接起来。</p>
+<p>配置器负责配置，同时也负责回收。</p>
+<p><img src="https://pic.downk.cc/item/5e8b705a504f4bcb047e35dc.png" /></p>
+<hr />
+<p>对于SGI STL中allocator的实现，这里就不做深入分析了。总结来说，allocator对以下几种情况进行了优化 - 多线程的问题 - 内存不足时的应变措施 - 过多小型区块可能造成的内存碎片问题</p>
+<p>realloc()的情况在之前就介绍过了。抛去可平凡复制的问题，对比来看，在小块且无多线程对于内存的干扰情况下，realloc()要比SGI STL的次级空间配置器高效的多；而在大块内存分配的情况下，realloc()会调用malloc()实现内存申请，与SGI STL allocator的一级配置器相同，效率基本相同，此时专门针对container涉及的allocator在内存复制时会使用专门的函数处理非POD的复制问题，更占有优势。 ## 总结</p>
+<p>综合来说，realloc()函数作为可以直接原地扩充的内存分配函数，在部分情况中确实展现出极高的扩充效率，然而其对于非平凡复制、内存碎片和多线程等问题并没有有效的解决方案。allocator的综合性能依然较realloc优越。</p>
+<p>以上为个人观点，欢迎大家指正与交流！</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>uniform64
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jyuniform64.github.io/posts/a5c1a8bd/" title="【C++】vector为何不用relloc">https://jyuniform64.github.io/posts/a5c1a8bd/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c++</a>
+              <a href="/tags/STL/" rel="tag"># STL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/445993eb/" rel="prev" title="【OS】中断和异常">
+      <i class="fa fa-chevron-left"></i> 【OS】中断和异常
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/1f9f64b4/" rel="next" title="socket编程基础知识">
+      socket编程基础知识 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#triviallycopyable"><span class="nav-number">2.</span> <span class="nav-text">TriviallyCopyable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#allocator-vs-realloc"><span class="nav-number">3.</span> <span class="nav-text">allocator VS realloc()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%99%A8allocator"><span class="nav-number">3.1.</span> <span class="nav-text">配置器(allocator)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E6%9C%89%E6%AC%A1%E9%85%8D%E7%BD%AE%E5%8A%9Bsub-allocation%E7%9A%84-sgi-%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">具有次配置力(sub-allocation)的 SGI 空间配置器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sgi-stl-%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.1.</span> <span class="nav-text">SGI STL 空间配置器的结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sgi-stl-%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8%E7%9A%84%E5%88%86%E6%9E%90"><span class="nav-number">3.2.2.</span> <span class="nav-text">SGI STL 空间配置器的分析</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="uniform64"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">uniform64</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JYuniform64" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JYuniform64" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jiny2048@gmail.com" title="E-Mail → mailto:jiny2048@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备20010232号 </a>
+      <img src="https://img.imgdb.cn/item/5e5a92ac6127cc071359d9fd.png" style="display: inline-block;"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011302002376" rel="noopener" target="_blank">粤公网安备 44011302002376号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">uniform64</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">47k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">43 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : '0betwlWUa9lqO4RehohBtxrL-MdYXbMMI',
+      appKey     : 'BEK6xsox1P9icK3mXrYx7b3j',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
