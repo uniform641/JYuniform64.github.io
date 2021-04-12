@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="建站 安装NodeJS 安装Hexo 1   $ npm install -g hexo   建站 1 2 3   $ hexo init  $ cd  $ npm install   基本配置 打开folder&#x2F;_config.yml 配置基本信息。  设置主题 将Hexo主题文件夹放置于&#x2F;themes 下。我的博客使用的是next主题。  部署至 GitHub 1   $ npm instal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo博客搭建">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/afcbc60d/index.html">
+<meta property="og:site_name" content="uniform64&#39;s blog">
+<meta property="og:description" content="建站 安装NodeJS 安装Hexo 1   $ npm install -g hexo   建站 1 2 3   $ hexo init  $ cd  $ npm install   基本配置 打开folder&#x2F;_config.yml 配置基本信息。  设置主题 将Hexo主题文件夹放置于&#x2F;themes 下。我的博客使用的是next主题。  部署至 GitHub 1   $ npm instal">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-12T05:34:56.000Z">
+<meta property="article:modified_time" content="2021-04-12T05:44:18.319Z">
+<meta property="article:author" content="uniform64">
+<meta property="article:tag" content="教程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jyuniform64.github.io/posts/afcbc60d/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>hexo博客搭建 | uniform64's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">uniform64's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-film fa-fw"></i>读书</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-book fa-fw"></i>观影</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/afcbc60d/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="uniform64">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="uniform64's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hexo博客搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-04-12 13:34:56 / 修改时间：13:44:18" itemprop="dateCreated datePublished" datetime="2021-04-12T13:34:56+08:00">2021-04-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%98%E8%85%BE%E5%8D%9A%E5%AE%A2/" itemprop="url" rel="index"><span itemprop="name">折腾博客</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/afcbc60d/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/afcbc60d/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="建站">建站</h2>
+<h3 id="安装nodejs">安装NodeJS</h3>
+<h3 id="安装hexo">安装Hexo</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo</span><br></pre></td></tr></table></figure>
+<h3 id="建站-1">建站</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ <span class="built_in">cd</span> &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
+<h3 id="基本配置">基本配置</h3>
+<p>打开<code>folder/_config.yml</code> 配置基本信息。</p>
+<h3 id="设置主题">设置主题</h3>
+<p>将Hexo主题文件夹放置于<code>/themes</code> 下。我的博客使用的是<a target="_blank" rel="noopener" href="https://github.com/theme-next/hexo-theme-next">next主题</a>。</p>
+<h3 id="部署至-github">部署至 GitHub</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">https://github.com/JYuniform64/JYuniform64.github.io</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/one-command-deployment">参考链接</a></p>
+<h2 id="使用">使用</h2>
+<h3 id="新增文章">新增文章</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [post] post_name</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/front-matter.html">参考链接</a></p>
+<h3 id="常用命令">常用命令</h3>
+<p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/commands">参考链接</a></p>
+<h2 id="常用主题配置">常用主题配置</h2>
+<p>如无特殊说明，以下配置信息均在<code>folder/themes/hexo-theme-next/_config.yml</code> 中。</p>
+<h3 id="统计文章字数">统计文章字数</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">item_text_post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">item_text_total:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h3 id="添加页面">添加页面</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new page your_page</span><br></pre></td></tr></table></figure>
+<p>会在<code>folder/source</code>下新建<code>your_page/index.md</code>，可以在其头部<code>type</code>中设定预定义的样式。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">home:</span> <span class="string">/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-home</span></span><br><span class="line">  <span class="comment">#about: /about/ || fa fa-user</span></span><br><span class="line">  <span class="attr">tags:</span> <span class="string">/tags/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-tags</span></span><br><span class="line">  <span class="attr">categories:</span> <span class="string">/categories/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-th</span></span><br><span class="line">  <span class="attr">archives:</span> <span class="string">/archives/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-archive</span></span><br><span class="line">  <span class="string">...</span></span><br></pre></td></tr></table></figure>
+<p>可根据情况去掉注释或新建项。如果是自己新建页的情况，可以选择增加博客显示语言的映射表项，位于<code>folder/themes/hexo-theme-next/languages/zh-CN.yml</code>中。如</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">home:</span> <span class="string">首页</span></span><br><span class="line">  <span class="attr">archives:</span> <span class="string">归档</span></span><br><span class="line">  <span class="attr">categories:</span> <span class="string">分类</span></span><br><span class="line">  <span class="attr">tags:</span> <span class="string">标签</span></span><br><span class="line">  <span class="string">...</span></span><br><span class="line">  <span class="attr">Books:</span> <span class="string">读书</span>  <span class="comment"># 新增</span></span><br><span class="line">  <span class="attr">Movies:</span> <span class="string">观影</span> <span class="comment"># 新增</span></span><br></pre></td></tr></table></figure>
+<h3 id="显示备案信息">显示备案信息</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">beian:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">icp:</span> <span class="string">粤ICP备xxx号</span></span><br><span class="line">  <span class="comment"># The digit in the num of gongan beian.</span></span><br><span class="line">  <span class="attr">gongan_id:</span> <span class="string">xxx</span></span><br><span class="line">  <span class="comment"># The full num of gongan beian.</span></span><br><span class="line">  <span class="attr">gongan_num:</span>  <span class="string">粤公网安备</span> <span class="string">xxx号</span></span><br><span class="line">  <span class="comment"># The icon for gongan beian. See: http://www.beian.gov.cn/portal/download</span></span><br><span class="line">  <span class="attr">gongan_icon_url:</span> <span class="string">xxx</span></span><br></pre></td></tr></table></figure>
+<h3 id="设置侧边栏头像及样式">设置侧边栏头像及样式</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># Replace the default image and set the url here.</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.jpg</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be dispalyed in circle.</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be rotated with the cursor.</span></span><br><span class="line">  <span class="attr">rotated:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<h3 id="社交链接">社交链接</h3>
+<p>将需要的链接去掉注释即可</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">social:</span></span><br><span class="line">  <span class="comment">#GitHub: https://github.com/yourname || fab fa-github</span></span><br><span class="line">  <span class="comment">#E-Mail: mailto:yourname@gmail.com || fa fa-envelope</span></span><br><span class="line">  <span class="comment">#Weibo: https://weibo.com/yourname || fab fa-weibo</span></span><br><span class="line">  <span class="string">...</span></span><br></pre></td></tr></table></figure>
+<h3 id="文章元信息显示">文章元信息显示</h3>
+<p>在文章title下方展示相关信息</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">post_meta:</span></span><br><span class="line">  <span class="attr">item_text:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">created_at:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">updated_at:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">another_day:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">categories:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<h3 id="代码块">代码块</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">codeblock:</span></span><br><span class="line">  <span class="comment"># Code Highlight theme</span></span><br><span class="line">  <span class="comment"># Available values: normal | night | night eighties | night blue | night bright | solarized | solarized dark | galactic</span></span><br><span class="line">  <span class="comment"># See: https://github.com/chriskempson/tomorrow-theme</span></span><br><span class="line">  <span class="attr">highlight_theme:</span> <span class="string">night</span></span><br><span class="line">  <span class="comment"># Add copy button on codeblock</span></span><br><span class="line">  <span class="attr">copy_button:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="comment"># Show text copy result.</span></span><br><span class="line">    <span class="attr">show_result:</span> <span class="literal">true</span></span><br><span class="line">    <span class="comment"># Available values: default | flat | mac</span></span><br><span class="line">    <span class="attr">style:</span> <span class="string">mac</span></span><br></pre></td></tr></table></figure>
+<h3 id="数学公式">数学公式</h3>
+<p>首先，卸载原有的渲染器 <code>hexo-renderer-marked</code>，并安装这两种渲染器的<strong>其中一个</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm uninstall hexo-renderer-marked</span><br><span class="line">$ npm install hexo-renderer-pandoc <span class="comment"># 或者 hexo-renderer-kramed</span></span><br></pre></td></tr></table></figure>
+<p>打开<code>mathjax</code>开关</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">mathjax:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># See: https://mhchem.github.io/MathJax-mhchem/</span></span><br><span class="line">  <span class="attr">mhchem:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<p>在需要用到公式的文章头部将<code>mathjax</code>打开</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mathjax: true</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/theme-next/hexo-theme-next/blob/master/docs/zh-CN/MATH.md">参考链接</a></p>
+<h3 id="阅读进度条">阅读进度条</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">reading_progress:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># Available values: top | bottom</span></span><br><span class="line">  <span class="attr">position:</span> <span class="string">top</span></span><br><span class="line">  <span class="attr">color:</span> <span class="string">&quot;#37c6c0&quot;</span></span><br><span class="line">  <span class="attr">height:</span> <span class="string">3px</span></span><br></pre></td></tr></table></figure>
+<h3 id="文章版权信息">文章版权信息</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">creative_commons:</span></span><br><span class="line">  <span class="attr">license:</span> <span class="string">by-nc-sa</span></span><br><span class="line">  <span class="attr">sidebar:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">language:</span></span><br></pre></td></tr></table></figure>
+<h3 id="评论系统">评论系统</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">valine:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">appid:</span> <span class="string">xxx</span></span><br><span class="line">  <span class="attr">appkey:</span> <span class="string">xxx</span></span><br><span class="line">  <span class="attr">notify:</span> <span class="literal">true</span> <span class="comment"># Mail notifier</span></span><br><span class="line">  <span class="attr">verify:</span> <span class="literal">false</span> <span class="comment"># Verification code</span></span><br><span class="line">  <span class="attr">placeholder:</span> <span class="string">Just</span> <span class="string">go</span> <span class="string">go</span> <span class="comment"># Comment box placeholder</span></span><br><span class="line">  <span class="attr">avatar:</span> <span class="string">mm</span> <span class="comment"># Gravatar style</span></span><br><span class="line">  <span class="attr">guest_info:</span> <span class="string">nick,mail,link</span> <span class="comment"># Custom comment header</span></span><br><span class="line">  <span class="attr">pageSize:</span> <span class="number">10</span> <span class="comment"># Pagination size</span></span><br><span class="line">  <span class="attr">language:</span> <span class="comment"># Language, available values: en, zh-cn</span></span><br><span class="line">  <span class="attr">visitor:</span> <span class="literal">false</span> <span class="comment"># Article reading statistic</span></span><br><span class="line">  <span class="attr">comment_count:</span> <span class="literal">true</span> <span class="comment"># If false, comment count will only be displayed in post page, not in home page</span></span><br><span class="line">  <span class="attr">recordIP:</span> <span class="literal">false</span> <span class="comment"># Whether to record the commenter IP</span></span><br><span class="line">  <span class="attr">serverURLs:</span> <span class="comment"># When the custom domain name is enabled, fill it in here (it will be detected automatically by default, no need to fill in)</span></span><br><span class="line">  <span class="comment">#post_meta_order: 0</span></span><br></pre></td></tr></table></figure>
+<h3 id="访客统计">访客统计</h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">busuanzi_count:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">total_visitors:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">total_visitors_icon:</span> <span class="string">fa</span> <span class="string">fa-user</span></span><br><span class="line">  <span class="attr">total_views:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">total_views_icon:</span> <span class="string">fa</span> <span class="string">fa-eye</span></span><br><span class="line">  <span class="attr">post_views:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">post_views_icon:</span> <span class="string">fa</span> <span class="string">fa-eye</span></span><br></pre></td></tr></table></figure>
+<h2 id="主题优化">主题优化</h2>
+<h3 id="永久链接">永久链接</h3>
+<p>默认的文章链接是按照<code>:year/:month/:day/:title/</code>的格式生成的，这样深层的路径不便于爬虫爬取及SEO，因此我们使用插件<a target="_blank" rel="noopener" href="https://github.com/rozbo/hexo-abbrlink">hexo-abbrlink</a> 生成永久链接。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-abbrlink --save</span><br></pre></td></tr></table></figure>
+<p>在<code>folder/_config.yml</code>中找到并修改：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">permalink:</span> <span class="string">posts/:abbrlink/</span></span><br></pre></td></tr></table></figure>
+<p>并在文件尾部加入配置信息</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># abbrlink config</span></span><br><span class="line"><span class="attr">abbrlink:</span></span><br><span class="line">  <span class="attr">alg:</span> <span class="string">crc32</span>      <span class="comment">#support crc16(default) and crc32</span></span><br><span class="line">  <span class="attr">rep:</span> <span class="string">hex</span>        <span class="comment">#support dec(default) and hex</span></span><br><span class="line">  <span class="attr">drafts:</span> <span class="literal">false</span>   <span class="comment">#(true)Process draft,(false)Do not process draft. false(default) </span></span><br><span class="line">  <span class="comment"># Generate categories from directory-tree</span></span><br><span class="line">  <span class="comment"># depth: the max_depth of directory-tree you want to generate, should &gt; 0</span></span><br><span class="line">  <span class="attr">auto_category:</span></span><br><span class="line">     <span class="attr">enable:</span> <span class="literal">true</span>  <span class="comment">#true(default)</span></span><br><span class="line">     <span class="attr">depth:</span>        <span class="comment">#3(default)</span></span><br><span class="line">     <span class="attr">over_write:</span> <span class="literal">false</span> </span><br><span class="line">  <span class="attr">auto_title:</span> <span class="literal">false</span> <span class="comment">#enable auto title, it can auto fill the title by path</span></span><br><span class="line">  <span class="attr">auto_date:</span> <span class="literal">false</span> <span class="comment">#enable auto date, it can auto fill the date by time today</span></span><br><span class="line">  <span class="attr">force:</span> <span class="literal">false</span> <span class="comment">#enable force mode,in this mode, the plugin will ignore the cache, and calc the abbrlink for every post even it already had abbrlink.</span></span><br></pre></td></tr></table></figure>
+<h3 id="添加背景图片">添加背景图片</h3>
+<p>在<code>folder/themes/hexo-theme-next/_config.yml</code>找到如下内容并去掉最后一行注释</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">custom_file_path:</span></span><br><span class="line">  <span class="comment">#head: source/_data/head.swig</span></span><br><span class="line">  <span class="comment">#header: source/_data/header.swig</span></span><br><span class="line">  <span class="comment">#sidebar: source/_data/sidebar.swig</span></span><br><span class="line">  <span class="comment">#postMeta: source/_data/post-meta.swig</span></span><br><span class="line">  <span class="comment">#postBodyEnd: source/_data/post-body-end.swig</span></span><br><span class="line">  <span class="comment">#footer: source/_data/footer.swig</span></span><br><span class="line">  <span class="comment">#bodyEnd: source/_data/body-end.swig</span></span><br><span class="line">  <span class="comment">#variable: source/_data/variables.styl</span></span><br><span class="line">  <span class="comment">#mixin: source/_data/mixins.styl</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">source/_data/styles.styl</span></span><br></pre></td></tr></table></figure>
+<p>在 <code>folder/source</code> 中新建 <code>_data/styles.styl</code>，并写入如下内容</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">body</span> &#123;</span><br><span class="line">  <span class="attr">background:</span> <span class="string">url(&quot;/images/background.png&quot;);</span></span><br><span class="line">  <span class="attr">background-size:</span> <span class="string">cover;</span></span><br><span class="line">  <span class="attr">background-repeat:</span> <span class="literal">no</span><span class="string">-repeat;</span></span><br><span class="line">  <span class="attr">background-attachment:</span> <span class="string">fixed;</span></span><br><span class="line">  <span class="attr">background-position:</span> <span class="string">center;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="string">.main-inner</span> &#123;</span><br><span class="line">  <span class="attr">width:</span> <span class="number">75</span><span class="string">%;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="string">.content,</span> <span class="string">.vpanel</span> &#123;</span><br><span class="line">  <span class="attr">border-radius:</span> <span class="string">10px;</span></span><br><span class="line">  <span class="attr">margin-top:</span> <span class="string">60px;</span></span><br><span class="line">  <span class="attr">padding:</span> <span class="string">25px;</span></span><br><span class="line">  <span class="string">background:rgba(255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.8</span><span class="string">)</span> <span class="string">none</span> <span class="string">repeat</span> <span class="string">scroll</span> <span class="type">!important;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中背景图像的位置在<code>folder/source/images/</code>中。</p>
+<p>13行<code>.vpanel</code>是对于评论区添加白色底衬的调整，如未开启评论区可删除<code>.vpanel</code>。</p>
+<h3 id="添加阅读全文按钮">添加“阅读全文”按钮</h3>
+<p>Next主题在主页中默认展示每篇文章的全文，如果存在长度较长的文章，则浏览体验较差。当然我们可以选择hexo的原生方法，即在文章中手动添加<code>&lt;!-- more --&gt;</code>的方式实现，但是对于我这样的懒人来说，这样的手动添加方式过于麻烦，且不便于文章md文件的可移植性。因此我们使用插件<a target="_blank" rel="noopener" href="https://www.npmjs.com/package/hexo-auto-excerpt">hexo-auto-excerpt</a>完成。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-auto-excerpt --save</span><br></pre></td></tr></table></figure>
+<p>然后在<code>folder/_config.yml</code>尾部添加配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">auto_excerpt:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">length:</span> <span class="number">150</span> </span><br></pre></td></tr></table></figure>
+<h3 id="添加豆瓣读书电影">添加豆瓣读书&amp;电影</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-douban --save</span><br></pre></td></tr></table></figure>
+<p>然后根据前文“添加页面”操作添加相应页面</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">Books:</span> <span class="string">/books/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-film</span>     <span class="comment">#This is your books page</span></span><br><span class="line">  <span class="attr">Movies:</span> <span class="string">/movies/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-book</span>   <span class="comment">#This is your movies page</span></span><br></pre></td></tr></table></figure>
+<p>然后在<code>folder/_config.yml</code>尾部添加配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">douban:</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">xxx</span></span><br><span class="line">  <span class="attr">builtin:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">book:</span></span><br><span class="line">    <span class="attr">title:</span> <span class="string">&#x27;This is my book title&#x27;</span></span><br><span class="line">    <span class="attr">quote:</span> <span class="string">&#x27;This is my book quote&#x27;</span></span><br><span class="line">  <span class="attr">movie:</span></span><br><span class="line">    <span class="attr">title:</span> <span class="string">&#x27;This is my movie title&#x27;</span></span><br><span class="line">    <span class="attr">quote:</span> <span class="string">&#x27;This is my movie quote&#x27;</span></span><br><span class="line">  <span class="attr">timeout:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/mythsman/hexo-douban">参考链接</a></p>
+<p>最后可以根据喜好修改页面样式。样式表位于<code>folder/node_modules/hexo-douban/lib/templates/index.css</code>。</p>
+<h2 id="todo">TODO</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+自定义修改header、footer样式</li>
+<li><input type="checkbox" disabled="" />
+增加个人说明页面</li>
+<li><input type="checkbox" disabled="" />
+增加留言板</li>
+<li><input type="checkbox" disabled="" />
+......</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>uniform64
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jyuniform64.github.io/posts/afcbc60d/" title="hexo博客搭建">https://jyuniform64.github.io/posts/afcbc60d/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%99%E7%A8%8B/" rel="tag"># 教程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/4a17b156/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%99"><span class="nav-number">1.</span> <span class="nav-text">建站</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85nodejs"><span class="nav-number">1.1.</span> <span class="nav-text">安装NodeJS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hexo"><span class="nav-number">1.2.</span> <span class="nav-text">安装Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%99-1"><span class="nav-number">1.3.</span> <span class="nav-text">建站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE"><span class="nav-number">1.4.</span> <span class="nav-text">基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E9%A2%98"><span class="nav-number">1.5.</span> <span class="nav-text">设置主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E8%87%B3-github"><span class="nav-number">1.6.</span> <span class="nav-text">部署至 GitHub</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0"><span class="nav-number">2.1.</span> <span class="nav-text">新增文章</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">2.2.</span> <span class="nav-text">常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">常用主题配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E6%96%87%E7%AB%A0%E5%AD%97%E6%95%B0"><span class="nav-number">3.1.</span> <span class="nav-text">统计文章字数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E9%A1%B5%E9%9D%A2"><span class="nav-number">3.2.</span> <span class="nav-text">添加页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA%E5%A4%87%E6%A1%88%E4%BF%A1%E6%81%AF"><span class="nav-number">3.3.</span> <span class="nav-text">显示备案信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E4%BE%A7%E8%BE%B9%E6%A0%8F%E5%A4%B4%E5%83%8F%E5%8F%8A%E6%A0%B7%E5%BC%8F"><span class="nav-number">3.4.</span> <span class="nav-text">设置侧边栏头像及样式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BE%E4%BA%A4%E9%93%BE%E6%8E%A5"><span class="nav-number">3.5.</span> <span class="nav-text">社交链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E7%AB%A0%E5%85%83%E4%BF%A1%E6%81%AF%E6%98%BE%E7%A4%BA"><span class="nav-number">3.6.</span> <span class="nav-text">文章元信息显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="nav-number">3.7.</span> <span class="nav-text">代码块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F"><span class="nav-number">3.8.</span> <span class="nav-text">数学公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%85%E8%AF%BB%E8%BF%9B%E5%BA%A6%E6%9D%A1"><span class="nav-number">3.9.</span> <span class="nav-text">阅读进度条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E7%AB%A0%E7%89%88%E6%9D%83%E4%BF%A1%E6%81%AF"><span class="nav-number">3.10.</span> <span class="nav-text">文章版权信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.11.</span> <span class="nav-text">评论系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E5%AE%A2%E7%BB%9F%E8%AE%A1"><span class="nav-number">3.12.</span> <span class="nav-text">访客统计</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E9%A2%98%E4%BC%98%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">主题优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B0%B8%E4%B9%85%E9%93%BE%E6%8E%A5"><span class="nav-number">4.1.</span> <span class="nav-text">永久链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E8%83%8C%E6%99%AF%E5%9B%BE%E7%89%87"><span class="nav-number">4.2.</span> <span class="nav-text">添加背景图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E9%98%85%E8%AF%BB%E5%85%A8%E6%96%87%E6%8C%89%E9%92%AE"><span class="nav-number">4.3.</span> <span class="nav-text">添加“阅读全文”按钮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E8%B1%86%E7%93%A3%E8%AF%BB%E4%B9%A6%E7%94%B5%E5%BD%B1"><span class="nav-number">4.4.</span> <span class="nav-text">添加豆瓣读书&amp;电影</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#todo"><span class="nav-number">5.</span> <span class="nav-text">TODO</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="uniform64"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">uniform64</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JYuniform64" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JYuniform64" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jiny2048@gmail.com" title="E-Mail → mailto:jiny2048@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备20010232号 </a>
+      <img src="https://img.imgdb.cn/item/5e5a92ac6127cc071359d9fd.png" style="display: inline-block;"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011302002376" rel="noopener" target="_blank">粤公网安备 44011302002376号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">uniform64</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">6k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : '0betwlWUa9lqO4RehohBtxrL-MdYXbMMI',
+      appKey     : 'BEK6xsox1P9icK3mXrYx7b3j',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
