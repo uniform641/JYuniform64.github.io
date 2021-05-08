@@ -21,30 +21,23 @@
     var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="overview interrupt and exception :OS&#x2F;processor&#x2F;present task trigger an event which need to be processed by the processor. I&#x2F;E is used to represent interrupt&#x2F;exception in the following contents more ac">
+  <meta name="description" content="这次的Assignment是完成一个最基本的shell（的很小一部分功能）。代码量很小，只有不到30行，但是里面的不少东西值得说道说道。  shell是什么 shell的使用场景常常给人一种错觉--它和内核是一伙的：shell完成了用户的命令，因此shell是内核的一部分。但事实情况是shell只是个普通的用户态程序，和我们运行的HelloWorld没什么不同。它的特殊之处在于它的功能--与用户进">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【OS】中断和异常">
-<meta property="og:url" content="https://jyuniform64.github.io/posts/445993eb/index.html">
+<meta property="og:title" content="【OS】mit6.828 Assignment shell">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/a153216/index.html">
 <meta property="og:site_name" content="uniform64&#39;s blog">
-<meta property="og:description" content="overview interrupt and exception :OS&#x2F;processor&#x2F;present task trigger an event which need to be processed by the processor. I&#x2F;E is used to represent interrupt&#x2F;exception in the following contents more ac">
+<meta property="og:description" content="这次的Assignment是完成一个最基本的shell（的很小一部分功能）。代码量很小，只有不到30行，但是里面的不少东西值得说道说道。  shell是什么 shell的使用场景常常给人一种错觉--它和内核是一伙的：shell完成了用户的命令，因此shell是内核的一部分。但事实情况是shell只是个普通的用户态程序，和我们运行的HelloWorld没什么不同。它的特殊之处在于它的功能--与用户进">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81b304504f4bcb04217ce0.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81b304504f4bcb04217ce2.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81e44b504f4bcb0446a629.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81e44b504f4bcb0446a62b.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81e685504f4bcb0448a0de.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81eb22504f4bcb044cc282.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e81eef0504f4bcb044fff2e.png">
-<meta property="og:image" content="https://pic.downk.cc/item/5e82077f504f4bcb0464ea4e.png">
-<meta property="article:published_time" content="2020-03-30T15:13:56.000Z">
-<meta property="article:modified_time" content="2021-04-12T15:22:41.570Z">
+<meta property="og:image" content="https://pic.imgdb.cn/item/6096b0ced1a9ae528f59227b.png">
+<meta property="article:published_time" content="2021-05-08T15:40:21.786Z">
+<meta property="article:modified_time" content="2021-05-08T15:45:43.480Z">
 <meta property="article:author" content="uniform64">
 <meta property="article:tag" content="OS">
-<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="6.828">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic.downk.cc/item/5e81b304504f4bcb04217ce0.png">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/6096b0ced1a9ae528f59227b.png">
 
-<link rel="canonical" href="https://jyuniform64.github.io/posts/445993eb/">
+<link rel="canonical" href="https://jyuniform64.github.io/posts/a153216/">
 
 
 <script id="page-configurations">
@@ -57,7 +50,7 @@
   };
 </script>
 
-  <title>【OS】中断和异常 | uniform64's blog</title>
+  <title>【OS】mit6.828 Assignment shell | uniform64's blog</title>
   
 
 
@@ -183,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/445993eb/">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/a153216/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -196,7 +189,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          【OS】中断和异常
+          【OS】mit6.828 Assignment shell
         </h1>
 
         <div class="post-meta">
@@ -205,16 +198,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-03-30 23:13:56" itemprop="dateCreated datePublished" datetime="2020-03-30T23:13:56+08:00">2020-03-30</time>
+              <time title="创建时间：2021-05-08 23:40:21 / 修改时间：23:45:43" itemprop="dateCreated datePublished" datetime="2021-05-08T23:40:21+08:00">2021-05-08</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-12 23:22:41" itemprop="dateModified" datetime="2021-04-12T23:22:41+08:00">2021-04-12</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -241,8 +228,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/posts/445993eb/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/445993eb/" itemprop="commentCount"></span>
+    <a title="valine" href="/posts/a153216/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/a153216/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -252,7 +239,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.2k</span>
+              <span>3.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -271,56 +258,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="overview">overview</h2>
-<p><code>interrupt</code> and <code>exception</code> :OS/processor/present task trigger an event which need to be processed by the processor. <code>I/E</code> <em>is used to represent interrupt/exception in the following contents</em> more accurate definition: &gt;- An interrupt is an asynchronous event that is typically triggered by an I/O device. &gt;- An exception is a synchronous event that is generated when the processor detects one or more predefined conditions while executing an instruction. The IA-32 architecture specifies three classes of exceptions: faults,traps, and aborts.</p>
-<p><span class="math display">\[current\ program\xrightarrow[]{I/E}I/E\ handler\]</span> - I/E mechanism is transparent for OS/program - recovery of program will not loss its concurrency</p>
-<h2 id="ie-vector">I/E vector</h2>
-<p><code>vector</code>:an identifier for a particular processor-defined I/E processor take the vector as an index in IDT(Interrupt Descriptor Table) to locate the entry of a I/E handler. ### range</p>
-<p>0-255 0-31:processor-defined 32-255:software-defined,either software interrupts or maskable hardware interrupts.</p>
-<h3 id="table">Table</h3>
-<p><img src="https://pic.downk.cc/item/5e81b304504f4bcb04217ce0.png" /> <img src="https://pic.downk.cc/item/5e81b304504f4bcb04217ce2.png" /> NOTES:</p>
+        <p>这次的Assignment是完成一个最基本的shell（的很小一部分功能）。代码量很小，只有不到30行，但是里面的不少东西值得说道说道。</p>
+<h2 id="shell是什么">shell是什么</h2>
+<p>shell的使用场景常常给人一种错觉--它和内核是一伙的：shell完成了用户的命令，因此shell是内核的一部分。<strong>但事实情况是shell只是个普通的用户态程序，和我们运行的HelloWorld没什么不同</strong>。它的特殊之处在于它的功能--与用户进行交互：接收用户实时输入的命令，对命令进行解析，然后根据解析结果向操作系统发送相应的请求，以完成用户的命令。换句话说，shell是个命令的中转站。我们大概可以使用如下的图示来表示shell的功能：</p>
+<p><img src="https://pic.imgdb.cn/item/6096b0ced1a9ae528f59227b.png" /></p>
+<p>shell干三件事情：（1）接收用户命令；（2）解析用户命令；（3）根据解析结果向内核发送请求，以完成用户命令。在Assignment的相关源代码<code>sh.c</code>中我们同样可以验证这一点：先<code>getcmd</code>，再<code>parsecmd</code>，最后<code>runcmd</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">char</span> buf[<span class="number">100</span>];</span><br><span class="line">  <span class="keyword">int</span> fd, r;</span><br><span class="line">  <span class="comment">// Read and run input commands.</span></span><br><span class="line">  <span class="keyword">while</span>(getcmd(buf, <span class="keyword">sizeof</span>(buf)) &gt;= <span class="number">0</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(buf[<span class="number">0</span>] == <span class="string">&#x27;c&#x27;</span> &amp;&amp; buf[<span class="number">1</span>] == <span class="string">&#x27;d&#x27;</span> &amp;&amp; buf[<span class="number">2</span>] == <span class="string">&#x27; &#x27;</span>)&#123;</span><br><span class="line">      <span class="comment">// Clumsy but will have to do for now.</span></span><br><span class="line">      <span class="comment">// Chdir has no effect on the parent if run in the child.</span></span><br><span class="line">      buf[<span class="built_in">strlen</span>(buf)<span class="number">-1</span>] = <span class="number">0</span>;  <span class="comment">// chop \n</span></span><br><span class="line">      <span class="keyword">if</span>(chdir(buf+<span class="number">3</span>) &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;cannot cd %s\n&quot;</span>, buf+<span class="number">3</span>);</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(fork1() == <span class="number">0</span>)</span><br><span class="line">      runcmd(parsecmd(buf));</span><br><span class="line">    wait(&amp;r);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="说说sh.c">说说sh.c</h2>
+<p>shell的功能我们已经在上一节进行了分解。<code>getcmd</code>没什么好说的，只是用来循环读入用户命令。<code>parsecmd</code>会将命令解析成一颗命令树。解析的过程对于没有接触过解释器的我来说还是很有意思的，其中也运用了一些精彩的技巧，另外涉及到组合命令优先级的问题。<code>runcmd</code>是我们需要完成的部分。我们需要对命令树中的某个特定命令进行执行。</p>
+<h2 id="创建进程为什么要两步">创建进程为什么要两步？</h2>
+<p>众所周知，在Linux中创建一个进程一般需要两步：<code>fork()</code>和<code>exec()</code>。<code>fork</code>产生一个几乎与父进程一样的子进程，<code>exec</code>则完成将可能的可执行文件加载到子进程的地址空间、重新初始化堆栈、重新设置PC到代码段入口点等工作。</p>
+<p>那么为什么不将这两个系统调用合并，像Windows创建进程一样直接使用<code>createProcess</code>呢？我考虑到有如下三个原因：</p>
 <ol type="1">
-<li>IA-32 processors after the Intel386 processor do not generate this exception.</li>
-<li>This exception was introduced in the Intel486 processor.</li>
-<li>This exception was introduced in the Pentium processor and enhanced in the P6 family processors.</li>
-<li>This exception was introduced in the Pentium III processor.</li>
-<li>This exception can occur only on processors that support the 1-setting of the “EPT-violation #VE” VM-execution control.</li>
+<li><p>这很优雅。相较Windows创建进程需要提供的一大堆参数而言，前者甚至可以不需要提供任何参数（如果不需要<code>exec()</code>的话）。</p></li>
+<li><p>使用<code>fork()</code>和<code>exec()</code>创建的进程在一定程度上维持了与父进程的联系，而这种联系在很多应用场景下都是十分必要的，例如一个shell fork出的众多子进程之间通过共享某些特定的参数组成一个进程组，便于操作系统的统一调度管理。</p></li>
+<li><p>在<code>fork()</code>后<code>exec()</code>前可以对子进程进行一些配置，例如对子进程的输入输出进行重定向。我们在下一节中就会看到这种看似简单的配置的强大威力。</p></li>
 </ol>
-<h2 id="ie-source">I/E source</h2>
-<h3 id="interrupt-source">interrupt source</h3>
-<p>interrupt ensures re-execution of the interrupted program. the return pointer points to the instruction after the one that caught an exception #### external interrupt(hardware)</p>
+<h2 id="shell的强大武器重定向管道">shell的强大武器：重定向、管道</h2>
+<p>我们可以把可执行程序想象成一段水管，水（数据）从一端（输入）进入水管（可执行程序），（经过处理），从另一端（输出）流出。</p>
+<p>我们是否可以在不干涉水管的前提下指定水流的源头和去处呢？当然可以！只需要shell在<code>fork()</code>后<code>exec()</code>前对进程的输入输出（<code>stdin</code>,<code>stdout</code>,<code>stderr</code>）进行重定向即可。当然这也要得益于Linux强大的文件抽象。</p>
+<p>我们是否可以在不干涉水管的前提下将口径相同的水管组装在一起呢？这样我们就可以根据需求拼接任意多的水管，使得水流可以自动地从第一个水管的入口流到最后一个水管的出口。当然可以！只需要shell在<code>fork()</code>后<code>exec()</code>前使用管道连接相邻的进程即可。</p>
+<p>通过shell提供的简洁却又威力无穷的工具，我们可以把进程的运行玩出一片花来。我想现在我们会对进程创建分步的原因有了更深的理解。</p>
+<h2 id="再说说sh.c">再说说sh.c</h2>
+<p>好了，前面铺垫了那么多，我们回归Assignment本身。需要我们实现的部分正是上一节描述的内容（外加创建普通进程）。</p>
+<p>进程的种类（普通、重定向、管道）由<code>struct cmd</code>中的<code>type</code>字段定义。我们首先来看普通进程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">&#x27; &#x27;</span>:</span><br><span class="line">  ecmd = (struct execcmd*)cmd;</span><br><span class="line">  <span class="keyword">if</span>(ecmd-&gt;argv[<span class="number">0</span>] == <span class="number">0</span>)</span><br><span class="line">    _exit(<span class="number">0</span>);</span><br><span class="line">  <span class="comment">// Your code here ...</span></span><br><span class="line">  <span class="keyword">if</span> (execvp(ecmd-&gt;argv[<span class="number">0</span>], ecmd-&gt;argv) &lt; <span class="number">0</span>)</span><br><span class="line">   <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;unknown cmd\n&quot;</span>);</span><br><span class="line">  <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>需要提一嘴的是<code>exec()</code>是个大家族，这里我们需要使用的是<code>execvp()</code>，具体内容RTM。</p>
+<p>下面是输入输出重定向的进程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">&#x27;&gt;&#x27;</span>:</span><br><span class="line"><span class="keyword">case</span> <span class="string">&#x27;&lt;&#x27;</span>:</span><br><span class="line">  rcmd = (struct redircmd*)cmd;</span><br><span class="line">  <span class="comment">// Your code here ...</span></span><br><span class="line">  close(rcmd-&gt;fd);</span><br><span class="line">  rcmd-&gt;fd = open(rcmd-&gt;file, rcmd-&gt;flags, S_IRWXU | S_IRGRP | S_IROTH);</span><br><span class="line">  <span class="keyword">if</span> (rcmd-&gt;fd == <span class="number">-1</span>)</span><br><span class="line">   <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;redir open failed\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  runcmd(rcmd-&gt;cmd);</span><br><span class="line">  close(rcmd-&gt;fd);</span><br><span class="line">  <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>这里需要用到的系统调用是<code>open()</code>和<code>close()</code>，另外欣赏这个美丽的递归。</p>
+<p>最后是涉及管道的进程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">&#x27;|&#x27;</span>:</span><br><span class="line">  pcmd = (struct pipecmd*)cmd;</span><br><span class="line">  <span class="comment">// Your code here ...</span></span><br><span class="line">  <span class="keyword">if</span> (pipe(p) != <span class="number">0</span>)</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;pip create failed\n&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> (fork1() == <span class="number">0</span>) &#123;</span><br><span class="line">    close(<span class="number">1</span>);</span><br><span class="line">    dup(p[<span class="number">1</span>]);</span><br><span class="line">    close(p[<span class="number">0</span>]);</span><br><span class="line">    close(p[<span class="number">1</span>]);</span><br><span class="line">    runcmd(pcmd-&gt;left);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    close(<span class="number">0</span>);</span><br><span class="line">    dup(p[<span class="number">0</span>]);</span><br><span class="line">    close(p[<span class="number">0</span>]);</span><br><span class="line">    close(p[<span class="number">1</span>]);</span><br><span class="line">    runcmd(pcmd-&gt;right);</span><br><span class="line">    wait(&amp;r);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>由于管道连接两个进程，所以这里我们需要对两个进程的输出和输入分别进行处理。管道的创建使用了系统调用<code>pipe()</code>。这里通过巧妙使用<code>close()</code>和<code>dup()</code>将进程的标准输入/输出的文件描述符设置为管道对应端口的文件描述符（妙啊.jpg）。另外一点是对于管道中不用的端口需要及时关闭，不然只要有文件描述符指着管道的端口，管道就不会关闭，导致进程一直认为管道的另一端会再传点什么东西过来，就有可能没法结束了。还有一点，父进程不要忘记<code>wait()</code>，使得子进程资源被彻底回收。</p>
+<h2 id="关于解析命令">关于解析命令</h2>
+<p>突然有点懒得写了Orz，简单记录一下吧。</p>
 <ul>
-<li>INTR received: maskable interrupt(vector 0-255) <strong>IF</strong> flag in <code>EFLAGS</code> can be set to mask such interrupts</li>
-<li>NMI received: non-maskable interrupt(vector 2)</li>
-</ul>
-<h4 id="software-generated">software-generated</h4>
-<p>instruction <code>INT n</code> generate interrupt from software(vector 0-255)</p>
-<h3 id="exception-source">exception source</h3>
-<h4 id="processor-detect">processor detect</h4>
+<li>关于命令解析的顺序：parsepipe-&gt;parseexec-&gt;parseredir</li>
+<li>解析任何命令都会返回统一的结构体指针<code>struct cmd *</code>，根据<code>struct cmd</code>中<code>type</code>的值再决定是哪一种具体的命令结构体，有多态的思想。</li>
+<li>两个辅助函数用处很大
 <ul>
-<li><strong>Fault</strong> : can be corrected. Recover to the instruction that generate a exception.</li>
-<li><strong>Trap</strong> : can be corrected. Recover to the instruction after the one which causes a exception.(if a JUMP instruction, then the return pointer points to jump destination)</li>
-<li><strong>Abort</strong> : disallow program recovery. report serious mistake such as hardware error. #### software-generated</li>
+<li><code>peek</code>：跳过空格，判断空格后的首个字符是否在备选区中</li>
+<li><code>gettoken</code>：跳过空格，返回下一个token</li>
+</ul></li>
 </ul>
-<p><code>INT 0</code>, <code>INT 3</code> and <code>BOUND</code> instruction.</p>
-<p>NOTE:caution for <code>INT n</code> instruction when n is a 80x86 vector.</p>
-<h2 id="ie-priority">I/E priority</h2>
-<p>When multiple I/E occur at the edge of an instruction, the one with highest priority will be processed first. The rest exception will be thrown and the the rest interrupts keep waiting. Thrown exceptions occur again when the program recover.</p>
-<p><img src="https://pic.downk.cc/item/5e81e44b504f4bcb0446a629.png" /> <img src="https://pic.downk.cc/item/5e81e44b504f4bcb0446a62b.png" /> NOTE:</p>
-<ol type="1">
-<li>The Intel® 486 processor and earlier processors group nonmaskable and maskable interrupts in the same priority class</li>
-</ol>
-<h2 id="about-idt-idtr">About IDT / IDTR</h2>
-<p>The interrupt descriptor table (IDT) associates each <strong>exception or interrupt</strong> vector with a gate descriptor for theprocedure or task used to service the associated exception or interrupt. IDT and IDTR(interrupt Descriptor Table Register)has the following structure:</p>
-<p><img src="https://pic.downk.cc/item/5e81e685504f4bcb0448a0de.png" /> - IDTR is used to locate IDT - The IDT may reside anywhere in the linear address space. - <strong>LIDT</strong> : load IDTR with CPL=0 only - <strong>SIDT</strong> : save IDTR with any CPL - processor uses 8*vector to locate gate for interrupt in IDT because each descriptor is 8B</p>
-<h3 id="idt-descriptor">IDT descriptor</h3>
-<p>The IDT may contain any of three kinds of gate descriptors: • Task-gate descriptor • Interrupt-gate descriptor • Trap-gate descriptor <img src="https://pic.downk.cc/item/5e81eb22504f4bcb044cc282.png" /></p>
-<ul>
-<li><p>Interrupt-gate and Trap-gate only differ in the way the processor handles the IF flag. They have the following procedure call: <img src="https://pic.downk.cc/item/5e81eef0504f4bcb044fff2e.png" /></p></li>
-<li><p>When an exception or interrupt handler is accessed through a task gate in the IDT, a task switch results. <img src="https://pic.downk.cc/item/5e82077f504f4bcb0464ea4e.png" /></p></li>
-</ul>
-<h2 id="reference">Reference</h2>
-<p><em>Intel® 64 and IA-32 Architectures Software Developer’s Manual</em></p>
 
     </div>
 
@@ -336,7 +316,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://jyuniform64.github.io/posts/445993eb/" title="【OS】中断和异常">https://jyuniform64.github.io/posts/445993eb/</a>
+    <a href="https://jyuniform64.github.io/posts/a153216/" title="【OS】mit6.828 Assignment shell">https://jyuniform64.github.io/posts/a153216/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -348,7 +328,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/OS/" rel="tag"># OS</a>
-              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/6-828/" rel="tag"># 6.828</a>
           </div>
 
         
@@ -357,13 +337,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/1ff15dcf/" rel="prev" title="URL与编码">
-      <i class="fa fa-chevron-left"></i> URL与编码
+    <a href="/posts/ee70f91d/" rel="prev" title="【OS】测验malloc的极限">
+      <i class="fa fa-chevron-left"></i> 【OS】测验malloc的极限
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/a5c1a8bd/" rel="next" title="【C++】vector为何不用relloc">
-      【C++】vector为何不用relloc <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -423,7 +400,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#overview"><span class="nav-number">1.</span> <span class="nav-text">overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ie-vector"><span class="nav-number">2.</span> <span class="nav-text">I&#x2F;E vector</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#table"><span class="nav-number">2.1.</span> <span class="nav-text">Table</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ie-source"><span class="nav-number">3.</span> <span class="nav-text">I&#x2F;E source</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#interrupt-source"><span class="nav-number">3.1.</span> <span class="nav-text">interrupt source</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#software-generated"><span class="nav-number">3.1.1.</span> <span class="nav-text">software-generated</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exception-source"><span class="nav-number">3.2.</span> <span class="nav-text">exception source</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#processor-detect"><span class="nav-number">3.2.1.</span> <span class="nav-text">processor detect</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ie-priority"><span class="nav-number">4.</span> <span class="nav-text">I&#x2F;E priority</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#about-idt-idtr"><span class="nav-number">5.</span> <span class="nav-text">About IDT &#x2F; IDTR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#idt-descriptor"><span class="nav-number">5.1.</span> <span class="nav-text">IDT descriptor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#shell%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">shell是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%B4%E8%AF%B4sh.c"><span class="nav-number">2.</span> <span class="nav-text">说说sh.c</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%BF%9B%E7%A8%8B%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%B8%A4%E6%AD%A5"><span class="nav-number">3.</span> <span class="nav-text">创建进程为什么要两步？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shell%E7%9A%84%E5%BC%BA%E5%A4%A7%E6%AD%A6%E5%99%A8%E9%87%8D%E5%AE%9A%E5%90%91%E7%AE%A1%E9%81%93"><span class="nav-number">4.</span> <span class="nav-text">shell的强大武器：重定向、管道</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%8D%E8%AF%B4%E8%AF%B4sh.c"><span class="nav-number">5.</span> <span class="nav-text">再说说sh.c</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E8%A7%A3%E6%9E%90%E5%91%BD%E4%BB%A4"><span class="nav-number">6.</span> <span class="nav-text">关于解析命令</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
