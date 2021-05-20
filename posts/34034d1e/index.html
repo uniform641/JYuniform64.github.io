@@ -21,27 +21,20 @@
     var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="0x00 前言 借着移动网络安全这门公选课的契机开始学习网络安全（我一个网络安全专业的学生竟然从公选课才能学习到专业知识QAQ），先从最基本的ARP欺骗学起吧。  0x01 ARP协议是干什么的 Address Resolution Protocol（地址解析协议），用来将IP地址转换为MAC地址，使网络适配器可以根据数据报报头的IP地址填入MAC地址，从而完成帧的封装与发送。  那么ARP是如何">
+  <meta name="description" content="现在是5月20号晚上。最近比较忙。有一些胡乱的事情和想法想记录下来。  最近比较忙，一部分是真的事情多，另一部分是焦虑和拖延造成的。计划中的进度从来就没实现过。  感觉自己定下了以后的研究方向，看了近两年顶会上的paper，又有点迷茫。  不知道未来的四个月会是什么样的情况，希望能进想进的组。有点畏难情绪。  面试了几个大厂，自认为积攒了不少经验。今天某大厂技术二面被教做人，完全没给自我发挥的空间">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【网络安全】ARP欺骗">
-<meta property="og:url" content="https://jyuniform64.github.io/posts/321fbfac/index.html">
+<meta property="og:title" content="【生活杂记】20210520">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/34034d1e/index.html">
 <meta property="og:site_name" content="uniform64&#39;s blog">
-<meta property="og:description" content="0x00 前言 借着移动网络安全这门公选课的契机开始学习网络安全（我一个网络安全专业的学生竟然从公选课才能学习到专业知识QAQ），先从最基本的ARP欺骗学起吧。  0x01 ARP协议是干什么的 Address Resolution Protocol（地址解析协议），用来将IP地址转换为MAC地址，使网络适配器可以根据数据报报头的IP地址填入MAC地址，从而完成帧的封装与发送。  那么ARP是如何">
+<meta property="og:description" content="现在是5月20号晚上。最近比较忙。有一些胡乱的事情和想法想记录下来。  最近比较忙，一部分是真的事情多，另一部分是焦虑和拖延造成的。计划中的进度从来就没实现过。  感觉自己定下了以后的研究方向，看了近两年顶会上的paper，又有点迷茫。  不知道未来的四个月会是什么样的情况，希望能进想进的组。有点畏难情绪。  面试了几个大厂，自认为积攒了不少经验。今天某大厂技术二面被教做人，完全没给自我发挥的空间">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post1.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post2.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post3.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post4.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post5.png">
-<meta property="article:published_time" content="2020-10-05T05:34:56.000Z">
-<meta property="article:modified_time" content="2021-04-12T15:23:36.165Z">
+<meta property="article:published_time" content="2021-05-20T17:48:27.259Z">
+<meta property="article:modified_time" content="2021-05-20T17:49:54.178Z">
 <meta property="article:author" content="uniform64">
-<meta property="article:tag" content="网络安全">
-<meta property="article:tag" content="ARP">
+<meta property="article:tag" content="生活">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post1.png">
 
-<link rel="canonical" href="https://jyuniform64.github.io/posts/321fbfac/">
+<link rel="canonical" href="https://jyuniform64.github.io/posts/34034d1e/">
 
 
 <script id="page-configurations">
@@ -54,7 +47,7 @@
   };
 </script>
 
-  <title>【网络安全】ARP欺骗 | uniform64's blog</title>
+  <title>【生活杂记】20210520 | uniform64's blog</title>
   
 
 
@@ -180,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/321fbfac/">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/34034d1e/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -193,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          【网络安全】ARP欺骗
+          【生活杂记】20210520
         </h1>
 
         <div class="post-meta">
@@ -202,23 +195,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-10-05 13:34:56" itemprop="dateCreated datePublished" datetime="2020-10-05T13:34:56+08:00">2020-10-05</time>
+              <time title="创建时间：2021-05-21 01:48:27 / 修改时间：01:49:54" itemprop="dateCreated datePublished" datetime="2021-05-21T01:48:27+08:00">2021-05-21</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-12 23:23:36" itemprop="dateModified" datetime="2021-04-12T23:23:36+08:00">2021-04-12</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E4%B8%8A/" itemprop="url" rel="index"><span itemprop="name">学习路上</span></a>
+                  <a href="/categories/%E9%A9%BB%E8%B6%B3%E5%9B%9E%E6%9C%9B/" itemprop="url" rel="index"><span itemprop="name">驻足回望</span></a>
                 </span>
             </span>
 
@@ -238,8 +225,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/posts/321fbfac/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/321fbfac/" itemprop="commentCount"></span>
+    <a title="valine" href="/posts/34034d1e/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/34034d1e/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -249,14 +236,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
+              <span>709</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -268,55 +255,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="x00-前言">0x00 前言</h2>
-<p>借着<em>移动网络安全</em>这门公选课的契机开始学习网络安全（我一个网络安全专业的学生竟然从公选课才能学习到专业知识QAQ），先从最基本的ARP欺骗学起吧。</p>
-<h2 id="x01-arp协议是干什么的">0x01 ARP协议是干什么的</h2>
-<p>Address Resolution Protocol（地址解析协议），用来将IP地址转换为MAC地址，使网络适配器可以根据数据报报头的IP地址填入MAC地址，从而完成帧的封装与发送。</p>
-<p>那么ARP是如何得知某个IP地址对应的MAC地址呢？当然是询问了。当一台主机想要与另一台主机通信却发现不知道对方的MAC地址时，就要发送一个<code>ARP REQUEST</code>的广播帧，向整个局域网中的主机询问。</p>
-<figure>
-<img src="images/post1.png" alt="" /><figcaption>image-20200923003729083</figcaption>
-</figure>
-<p>这时，每一台收到这个广播帧的主机都会将它传递至网络层，并检查本机的IP地址是否与ARP报文中询问的IP地址相同。不相同则丢弃该包，相同则向报文中的<code>Sender MAC address</code>发送一个<code>ARP REPLY</code>帧，告知其自己的MAC地址。</p>
-<figure>
-<img src="images/post2.png" alt="" /><figcaption>image-20200923004612416</figcaption>
-</figure>
-<p>收到<code>ARP REPLY</code>的询问者此时知道了该IP地址对应的MAC地址，并将这个IP地址到MAC地址的映射存入自己的ARP表中。这个表记录了所有主机已知的地址映射，每一个表项都有一个TTL值表示其有效期。</p>
-<p>当某一表项有效期到期后，主机会自动删除该表项。而在此之前，主机仍会不死心地向要被删除的MAC地址问一句：你的IP地址对应的MAC地址是多少啊？</p>
-<figure>
-<img src="images/post3.png" alt="" /><figcaption>image-20200923005756759</figcaption>
-</figure>
-<p>我们注意这里以太网帧的目的地址并不是<code>ff:ff:ff:ff:ff:ff</code>广播地址，而是被删除项的MAC地址。</p>
-<p>若得到回应，则说明该表项依然有效。主机会更新其TTL值，继续放入ARP表中。</p>
-<p>除此之外，通过wireshark我们还能观察到ARP的一些其他功能：</p>
-<figure>
-<img src="images/post4.png" alt="" /><figcaption>image-20200923010427957</figcaption>
-</figure>
-<p>对于344与346号包，它们的内容似乎与上述提到的包不大一样。</p>
-<p>我们可以看到344号包中有<code>ARP Probe</code>，这是向局域网中其他主机询问：有没有人拥有这个IP地址啊？没有的话我就用了。</p>
-<p>在等待一段时间后，它判断该IP地址是可用的，于是发出<code>ARP Announcement</code>表明自己从此使用该IP地址。</p>
-<h2 id="x02-arp欺骗是什么">0x02 ARP欺骗是什么</h2>
-<p>ARP欺骗属于中间人攻击的一种，我们首先来看维基百科对于中间人攻击的解释</p>
-<blockquote>
-<p><strong>中间人攻击</strong>（英语：<strong>M</strong>an-<strong>i</strong>n-<strong>t</strong>he-<strong>m</strong>iddle attack，缩写：<strong>MITM</strong>）在密码学和计算机安全领域中是指攻击者与通讯的两端分别创建独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。在许多情况下这是很简单的（例如，在一个未加密的Wi-Fi无线接入点的接受范围内的中间人攻击者，可以将自己作为一个中间人插入这个网络）。</p>
-<p>一个中间人攻击能成功的前提条件是攻击者能将自己伪装成每一个参与会话的终端，并且不被其他终端识破。中间人攻击是一个（缺乏）相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法以阻止中间人攻击。例如，SSL协议可以验证参与通讯的一方或双方使用的证书是否是由权威的受信任的数字证书认证机构颁发，并且能执行双向身份认证。</p>
-</blockquote>
-<p>简单来说，对于相互通信的A与B，中间人M面对A伪装成B，面对B伪装成A，这样就从逻辑上插入到A与B的通信链路中间，可以对其通信进行监听或者篡改。</p>
-<p><span class="math inline">\(A\Leftrightarrow M \Leftrightarrow B\)</span></p>
-<p>在ARP欺骗（或者称为ARP毒化）中，攻击者通过向A发送ARP包将表项<span class="math display">\[(B_{IP},M_{MAC})\]</span>加入到A的ARP表中，通过向B发送ARP包将表项<span class="math display">\[(A_{IP},M_{MAC})\]</span>加入到B的ARP表中，从而使得A发送给B的包、B发送给A的包都被发送到攻击者那里，进而攻击者成功地变成了A、B的中间人。这个过程正是利用ARP对A、B进行欺骗，从而达到攻击的目的，因此叫做ARP欺骗。</p>
-<p>由于ARP在局域网中运行，因此ARP欺骗的适用范围也仅限局域网。</p>
-<h2 id="x03-如何实现arp欺骗">0x03 如何实现ARP欺骗</h2>
-<p>根据0x01中介绍的ARP工作原理，我们要想向一台主机中插入恶意表项似乎只能等待该主机主动发问，然后伪装为另一台主机进行ARP响应。但是这个过程只发生在一台主机接入网络后第一次与另一台主机通信时，由此时机进行攻击太过苛刻，<del>我们需要找到另一种ARP表更新的条件。</del>我们直接用现成的工具试一试吧。</p>
-<p>这里我们使用了Kali Linux中的ettercap工具实施ARP欺骗，具体的流程网上有很多教程了，这里不再赘述。我们感兴趣的是如何主动地实施ARP欺骗。</p>
-<figure>
-<img src="images/post5.png" alt="" /><figcaption>img</figcaption>
-</figure>
-<p>上述截图是攻击成功后的抓包截图，我们看到攻击者为了维持恶意ARP表项存在于A与B的ARP表中，每隔10s主动向A与B分别发送含有恶意表项的<code>ARP REPLY</code>。这表明即使是没有经过<code>ARP REQUEST</code>而得到的<code>ARP REPLY</code>也会被主机接受，进而更新ARP表项。因此，如何实现主动ARP攻击呢？只需“无厘头地”向目标主机发送一个恶意的<code>ARP REPLY</code>即可。</p>
-<h2 id="x04-关于arp欺骗的一些思考">0x04 关于ARP欺骗的一些思考</h2>
-<p>为什么局域网内的主机会接受一个未经请求的ARP应答呢？这并非设计协议的漏洞，而是现实需要。有一种<a target="_blank" rel="noopener" href="https://gitlab.com/wireshark/wireshark/-/wikis/Gratuitous_ARP">Gratuitous ARP</a>，其行为与上述ARP欺骗相似。详见链接。</p>
-<p>为了防范ARP欺骗，一种有效的方式是采用send-ack方式。即当收到一个修改mac地址表的ARP响应报文时，先向被修改项发送一个指向应查询数据包，如果得到可以修改的请求，则进行修改。</p>
-<p>写得很好的相关资料：</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/csguo/p/7527582.html">ARP防御篇-如何揪出“内鬼”并“优雅的还手”</a></p>
-<p><a target="_blank" rel="noopener" href="http://www.bingdun.com/news/security/9591.htm">企业ARP欺骗分析及防御：不同网段欺骗分析及对策</a></p>
+        <p>现在是5月20号晚上。最近比较忙。有一些胡乱的事情和想法想记录下来。</p>
+<p>最近比较忙，一部分是真的事情多，另一部分是焦虑和拖延造成的。计划中的进度从来就没实现过。</p>
+<p>感觉自己定下了以后的研究方向，看了近两年顶会上的paper，又有点迷茫。</p>
+<p>不知道未来的四个月会是什么样的情况，希望能进想进的组。有点畏难情绪。</p>
+<p>面试了几个大厂，自认为积攒了不少经验。今天某大厂技术二面被教做人，完全没给自我发挥的空间，开始后就来了个夺命三连问，问的我抓耳挠腮哑口无言。复盘要做，另起一篇文章。</p>
+<p>今天我一个最好的朋友毕业离开了，我帮他把行李搬到车上，想起三年前入学时把我提早到的行李送到我宿舍的情景。一方面感慨时间飞逝，另一方面不禁感伤。转头进生活区总觉得有哪里不一样了。他是一个非常优秀和丰富的人，给我带来了一抹美丽的风景。祝好吧。</p>
+<p>晚上出去看电影，走在路上。路上热闹非凡，俊男靓女，青春的激情浪漫活力四溢，砸的我一阵恍惚。我调侃每次去南校都感觉像是进城。每天宿舍、食堂、教室三点一线的生活让我在这时候感觉和社会有点脱节，甚至和理想中的大学生活有点脱节。</p>
+<p>一个人看了电影《我要我们在一起》，全场基本是情侣。说实话最初我基本是奔着女主去的。男主这个悲惨境遇有点夸张，除了拥有女主之外没有一件好事让他遇上。还有其他一些缺点。不过总的来说算是个不错的爱情片，至少有地方确实打动我了。那种压抑状态下的情感表达挺打动人的。两人的感情让我羡慕。另有两个小的想法：压抑到深处释放出来就是做爱吗？这个场景在好多电影里看到过；同样的感情换到一对颜值很普通的情侣身上，或者用纯文字描述，产生的效果显然是不一样的。</p>
+<p>写作能力不行，写几句话费老鼻子劲，写出来语句不通。慢慢写着来吧。</p>
 
     </div>
 
@@ -332,7 +279,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://jyuniform64.github.io/posts/321fbfac/" title="【网络安全】ARP欺骗">https://jyuniform64.github.io/posts/321fbfac/</a>
+    <a href="https://jyuniform64.github.io/posts/34034d1e/" title="【生活杂记】20210520">https://jyuniform64.github.io/posts/34034d1e/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -343,8 +290,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag"># 网络安全</a>
-              <a href="/tags/ARP/" rel="tag"># ARP</a>
+              <a href="/tags/%E7%94%9F%E6%B4%BB/" rel="tag"># 生活</a>
           </div>
 
         
@@ -353,13 +299,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/501bc483/" rel="prev" title="关于以后的一点想法">
-      <i class="fa fa-chevron-left"></i> 关于以后的一点想法
+    <a href="/posts/cafdf006/" rel="prev" title="【OS】Linux信号处理机制">
+      <i class="fa fa-chevron-left"></i> 【OS】Linux信号处理机制
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/e59f0b2f/" rel="next" title="【OS】mit6.828 Lab1">
-      【OS】mit6.828 Lab1 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -419,7 +362,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#x00-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">0x00 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x01-arp%E5%8D%8F%E8%AE%AE%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84"><span class="nav-number">2.</span> <span class="nav-text">0x01 ARP协议是干什么的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x02-arp%E6%AC%BA%E9%AA%97%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">3.</span> <span class="nav-text">0x02 ARP欺骗是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x03-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0arp%E6%AC%BA%E9%AA%97"><span class="nav-number">4.</span> <span class="nav-text">0x03 如何实现ARP欺骗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x04-%E5%85%B3%E4%BA%8Earp%E6%AC%BA%E9%AA%97%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">0x04 关于ARP欺骗的一些思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -638,59 +580,6 @@ window.addEventListener('pjax:success', () => {
   
 
   
-      
-
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 
