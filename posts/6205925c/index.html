@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="胡言乱语的开头 事情还得从两天前的面试说起。没有自我介绍，面试官问我的第一个问题就是：C++中定义一个空的类，那么它的 sizeof 是多少？我内心：woc我怎么知道。面试官继续发问：如果给这个类中加一个空的虚析构函数，那么它的 sizeof 是多少？连蒙带猜给了个答案。面试官再次发问：如果给这个类中加一个静态函数，那么它的 sizeof 是多少？我：QAQ。  虽然从我个人角度去看，这几个问题似">
+<meta property="og:type" content="article">
+<meta property="og:title" content="那些面试的翻车题（一）">
+<meta property="og:url" content="https://jyuniform64.github.io/posts/6205925c/index.html">
+<meta property="og:site_name" content="uniform64&#39;s blog">
+<meta property="og:description" content="胡言乱语的开头 事情还得从两天前的面试说起。没有自我介绍，面试官问我的第一个问题就是：C++中定义一个空的类，那么它的 sizeof 是多少？我内心：woc我怎么知道。面试官继续发问：如果给这个类中加一个空的虚析构函数，那么它的 sizeof 是多少？连蒙带猜给了个答案。面试官再次发问：如果给这个类中加一个静态函数，那么它的 sizeof 是多少？我：QAQ。  虽然从我个人角度去看，这几个问题似">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pic.imgdb.cn/item/60a934fe6ae4f77d35c35eab.png">
+<meta property="article:published_time" content="2021-05-22T17:15:02.895Z">
+<meta property="article:modified_time" content="2021-05-22T17:19:12.712Z">
+<meta property="article:author" content="uniform64">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="编译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/60a934fe6ae4f77d35c35eab.png">
+
+<link rel="canonical" href="https://jyuniform64.github.io/posts/6205925c/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>那些面试的翻车题（一） | uniform64's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">uniform64's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-film fa-fw"></i>读书</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-book fa-fw"></i>观影</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/6205925c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="uniform64">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="uniform64's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          那些面试的翻车题（一）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-23 01:15:02 / 修改时间：01:19:12" itemprop="dateCreated datePublished" datetime="2021-05-23T01:15:02+08:00">2021-05-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E4%B8%8A/" itemprop="url" rel="index"><span itemprop="name">学习路上</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/6205925c/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/6205925c/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="胡言乱语的开头">胡言乱语的开头</h2>
+<p>事情还得从两天前的面试说起。没有自我介绍，面试官问我的第一个问题就是：C++中定义一个空的类，那么它的 <code>sizeof</code> 是多少？我内心：woc我怎么知道。面试官继续发问：如果给这个类中加一个空的虚析构函数，那么它的 <code>sizeof</code> 是多少？连蒙带猜给了个答案。面试官再次发问：如果给这个类中加一个静态函数，那么它的 <code>sizeof</code> 是多少？我：QAQ。</p>
+<p>虽然从我个人角度去看，这几个问题似乎没什么意义 <del>给自己菜找借口</del>，但是不让我运行一下我还真的不敢确定地说出答案是多少。因此这也暴漏了我在相关方面的短板。所以呢，还是要好好研究一下，顺便复习一下编译链接过程的相关知识。</p>
+<h2 id="sizeof">sizeof</h2>
+<p>先简单回顾一下 <code>sizeof</code>。我们很早就知道 <code>sizeof</code> 是个运算符，用来查询一个对象或者一个类型的大小，单位是 <code>byte</code>。对于基本的内置类型，<code>sizeof</code> 的使用不存在什么问题。下面列出一些可能令人困惑的地方：</p>
+<ul>
+<li><code>sizeof</code> 是全能的吗？显然不是。我们不可以对 <code>function</code>，<code>incomplete type</code>，以及<code>bit field</code>使用 <code>sizeof</code> 。<code>incomplete type</code> 是指缺乏决定其大小的信息的类型（这不是循环解释233），比如 <code>void</code>，比如 <code>extern char a[]</code>。前两者不能用是因为编译器不知道它们的大小是多少。是的，完成 <code>sizeof</code> 功能的是编译器，我们在后面的汇编代码中也可以看到这一点。显然对于前二者而言，不在链接后或运行时是无法知道其大小的。对于最后一条，纯粹是因为<code>sizeof</code> 的单位没法表示。</li>
+<li><code>sizeof(pointer)</code> 是指针本身的大小；<code>sizeof(reference)</code> 是被引对象的大小；<code>sizeof(array)</code> 是数组的大小；<code>sizeof(class)</code> 是对应的对象数组中单个元素的大小，这其中包括对象的内容和可能的填充。</li>
+</ul>
+<h2 id="空对象的大小">空对象的大小</h2>
+<p>按照<del>我的歪理</del>常理推断，一个空的对象中什么都没有，那大小自然是 <code>0</code> 了。可是，当我运行下面的代码后</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>&#123;</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    A a;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in"><span class="keyword">sizeof</span></span>(a) &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in"><span class="keyword">sizeof</span></span>(A) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得到的运行结果是两个 <code>1</code>。看着结果我不禁陷入懵逼。这个结果可以得到两个结论：<code>sizeof</code> 对类和对象不做区分，认为二者都是 <code>class type</code>；空对象的大小为 <code>1</code>。前者没什么好说的，但是空对象里面这 <code>1 byte</code>的空间到底放了什么东西呢？尤其是当我们对比运行以下代码后：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>&#123;</span></span><br><span class="line">	<span class="keyword">char</span> ch;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    A a;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in"><span class="keyword">sizeof</span></span>(a) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>会得到与空对象相同的结果。进行分析：后者的 <code>1 byte</code> 必然存放的是 <code>ch</code> ，而前者的 <code>1 byte</code> 并没有存放任何有意义的东西（不然后者的大小就不会是 <code>1 byte</code> 了）。那么空对象的 <code>1 byte</code> 的作用就显而易见了：<strong>占位</strong>。</p>
+<p>为什么要占位呢？</p>
+<ol type="1">
+<li>编译器靠什么来区分不同的对象（变量）呢？不是变量名，而是与之绑定的存储对象（变量）的地址。因此，地址就是一个对象的 <code>unique identifier</code>，对于空对象也是如此。要想区分不同的空对象，就要对每个空对象分配不同的地址。因此空对象的大小自然不能为 <code>0</code>。</li>
+<li>让我们设想一个空对象数组。如果空对象的大小为 <code>0</code>，那么这个数组中指针的加法就会失效，这显然是不可以接受的。</li>
+</ol>
+<p>P.S. ：滑稽.jpg</p>
+<p><img src="https://pic.imgdb.cn/item/60a934fe6ae4f77d35c35eab.png" /></p>
+<h2 id="加个虚函数">加个虚函数</h2>
+<p>面试时候回答空对象的大小加一个指向虚表的指针的大小。而根据上述实验的结论，大小应该是 <code>8</code>（64位机器和编译器）。使用如下代码进行实验：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test1.cpp</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AAA</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">AAA</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    AAA a;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in"><span class="keyword">sizeof</span></span>(a) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果是 <code>8</code>。里面应该只有一个指向虚表的指针。但是为了验证这个猜想，我们需要把类的内存布局打印出来。怎么打印呢？我在 <code>gcc</code> 的 documentation 里找到了这样一个编译选项（gcc版本 9.3.0，编译选项在 <code>3.17 GCC Developer Options</code> 中）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-fdump-lang-class</span><br><span class="line"></span><br><span class="line">Dump class hierarchy information. Virtual table information is emitted unless ’‘slim’’ is specified. This option is applicable to C++ only.</span><br></pre></td></tr></table></figure>
+<p>注：之前在 SO 中看到有人说 <code>-fdump-class-hierarchy</code> 这个编译选项，不过使用时发现编译器报错。后经查找，<code>gcc</code> 在 8.0 后就废除了这个编译选项（<a target="_blank" rel="noopener" href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89712">链接</a>）。</p>
+<p>编译后得到文件 <code>test1.cpp.001l.class</code>，查找到 <code>AAA</code> 相关内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Vtable for AAA</span><br><span class="line">AAA::_ZTV3AAA: 4 entries</span><br><span class="line">0     (int (*)(...))0</span><br><span class="line">8     (int (*)(...))(&amp; _ZTI3AAA)</span><br><span class="line">16    (int (*)(...))AAA::~AAA</span><br><span class="line">24    (int (*)(...))AAA::~AAA</span><br><span class="line"></span><br><span class="line">Class AAA</span><br><span class="line">   size&#x3D;8 align&#x3D;8</span><br><span class="line">   base size&#x3D;8 base align&#x3D;8</span><br><span class="line">AAA (0x0x7f93df7a8d80) 0 nearly-empty</span><br><span class="line">    vptr&#x3D;((&amp; AAA::_ZTV3AAA) + 16)</span><br></pre></td></tr></table></figure>
+<p>猜想无误。</p>
+<h2 id="加个静态函数">加个静态函数</h2>
+<p>这个问题其实是在问，（静态）成员函数放在哪里。其实如果对 <code>sizeof</code> 熟悉的话，是可以直接推测出来：<code>sizeof(class)</code> 没问题，<code>sizeof(function)</code> 不行，所以 <code>function</code> 不在 <code>class</code> 里面。当然这个推测有点扯淡，我们还是直接实验一下。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//test2.cpp</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AAA</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">funnnnnnn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">            std::cout &lt;&lt; i &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    AAA a;</span><br><span class="line">    a.<span class="built_in">funnnnnnn</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>使用命令 <code>gcc -fdump-lang-class -c test2.cpp</code> 编译，得到文件 <code>test2.cpp.001l.class</code>的相关内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Class AAA</span><br><span class="line">   size&#x3D;1 align&#x3D;1</span><br><span class="line">   base size&#x3D;0 base align&#x3D;1</span><br><span class="line">AAA (0x0x7f02ed6c8d80) 0 empty</span><br></pre></td></tr></table></figure>
+<p>和空类是一样的。那么静态函数放在哪里了呢？我们使用命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -c test2.cpp</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> objdump -s -d test2.o &gt; out2</span></span><br></pre></td></tr></table></figure>
+<p>查看编译后的 elf 文件，找到相关信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Disassembly of section .text._ZN3AAA9funnnnnnnEv:</span><br><span class="line"></span><br><span class="line">0000000000000000 &lt;_ZN3AAA9funnnnnnnEv&gt;:</span><br><span class="line">   0:	f3 0f 1e fa          	endbr64 </span><br><span class="line">   4:	55                   	push   %rbp</span><br><span class="line">   5:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">   8:	48 83 ec 10          	sub    $0x10,%rsp</span><br><span class="line">   c:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%rbp)</span><br><span class="line">  13:	83 7d fc 09          	cmpl   $0x9,-0x4(%rbp)</span><br><span class="line">  17:	7f 2c                	jg     45 &lt;_ZN3AAA9funnnnnnnEv+0x45&gt;</span><br><span class="line">  19:	8b 45 fc             	mov    -0x4(%rbp),%eax</span><br><span class="line">  1c:	89 c6                	mov    %eax,%esi</span><br><span class="line">  1e:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 25 &lt;_ZN3AAA9funnnnnnnEv+0x25&gt;</span><br><span class="line">  25:	e8 00 00 00 00       	callq  2a &lt;_ZN3AAA9funnnnnnnEv+0x2a&gt;</span><br><span class="line">  2a:	48 89 c2             	mov    %rax,%rdx</span><br><span class="line">  2d:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 34 &lt;_ZN3AAA9funnnnnnnEv+0x34&gt;</span><br><span class="line">  34:	48 89 c6             	mov    %rax,%rsi</span><br><span class="line">  37:	48 89 d7             	mov    %rdx,%rdi</span><br><span class="line">  3a:	e8 00 00 00 00       	callq  3f &lt;_ZN3AAA9funnnnnnnEv+0x3f&gt;</span><br><span class="line">  3f:	83 45 fc 01          	addl   $0x1,-0x4(%rbp)</span><br><span class="line">  43:	eb ce                	jmp    13 &lt;_ZN3AAA9funnnnnnnEv+0x13&gt;</span><br><span class="line">  45:	90                   	nop</span><br><span class="line">  46:	c9                   	leaveq </span><br><span class="line">  47:	c3                   	retq   </span><br></pre></td></tr></table></figure>
+<p>注意 C++ 代码中的名字（变量名、函数名、类名）都会被编译器修饰，可以通过 builtin 工具 <code>c++filt</code>进行解析。和本文无关，这里不再详细展开。</p>
+<p>我们可以看到这个静态成员函数也是规规矩矩呆在<code>.text</code>段，只不过编译器进一步给它加了作用域限定 <code>._ZN3AAA9funnnnnnnEv</code>。除此之外和正常的函数没什么不同。为了说明这一点，我们给源代码加了个同名函数</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">funnnnnnn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">        std::cout &lt;&lt; i &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再次进行编译。得到<code>void funnnnnnn()</code>的汇编内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">0000000000000018 &lt;_Z9funnnnnnnv&gt;:</span><br><span class="line">  18:	f3 0f 1e fa          	endbr64 </span><br><span class="line">  1c:	55                   	push   %rbp</span><br><span class="line">  1d:	48 89 e5             	mov    %rsp,%rbp</span><br><span class="line">  20:	48 83 ec 10          	sub    $0x10,%rsp</span><br><span class="line">  24:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%rbp)</span><br><span class="line">  2b:	83 7d fc 09          	cmpl   $0x9,-0x4(%rbp)</span><br><span class="line">  2f:	7f 2c                	jg     5d &lt;_Z9funnnnnnnv+0x45&gt;</span><br><span class="line">  31:	8b 45 fc             	mov    -0x4(%rbp),%eax</span><br><span class="line">  34:	89 c6                	mov    %eax,%esi</span><br><span class="line">  36:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 3d &lt;_Z9funnnnnnnv+0x25&gt;</span><br><span class="line">  3d:	e8 00 00 00 00       	callq  42 &lt;_Z9funnnnnnnv+0x2a&gt;</span><br><span class="line">  42:	48 89 c2             	mov    %rax,%rdx</span><br><span class="line">  45:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 4c &lt;_Z9funnnnnnnv+0x34&gt;</span><br><span class="line">  4c:	48 89 c6             	mov    %rax,%rsi</span><br><span class="line">  4f:	48 89 d7             	mov    %rdx,%rdi</span><br><span class="line">  52:	e8 00 00 00 00       	callq  57 &lt;_Z9funnnnnnnv+0x3f&gt;</span><br><span class="line">  57:	83 45 fc 01          	addl   $0x1,-0x4(%rbp)</span><br><span class="line">  5b:	eb ce                	jmp    2b &lt;_Z9funnnnnnnv+0x13&gt;</span><br><span class="line">  5d:	90                   	nop</span><br><span class="line">  5e:	c9                   	leaveq </span><br><span class="line">  5f:	c3                   	retq   </span><br></pre></td></tr></table></figure>
+<p>嘿！完全一样！</p>
+<h2 id="放在结尾">放在结尾</h2>
+<p>这一通实验搞下来，也<del>恢复</del>增加了不少关于汇编的知识，想想另开一篇吧。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>uniform64
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jyuniform64.github.io/posts/6205925c/" title="那些面试的翻车题（一）">https://jyuniform64.github.io/posts/6205925c/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c++</a>
+              <a href="/tags/%E7%BC%96%E8%AF%91/" rel="tag"># 编译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/34034d1e/" rel="prev" title="【生活杂记】20210520">
+      <i class="fa fa-chevron-left"></i> 【生活杂记】20210520
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%A1%E8%A8%80%E4%B9%B1%E8%AF%AD%E7%9A%84%E5%BC%80%E5%A4%B4"><span class="nav-number">1.</span> <span class="nav-text">胡言乱语的开头</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sizeof"><span class="nav-number">2.</span> <span class="nav-text">sizeof</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">3.</span> <span class="nav-text">空对象的大小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E4%B8%AA%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">加个虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E4%B8%AA%E9%9D%99%E6%80%81%E5%87%BD%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">加个静态函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BE%E5%9C%A8%E7%BB%93%E5%B0%BE"><span class="nav-number">6.</span> <span class="nav-text">放在结尾</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="uniform64"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">uniform64</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JYuniform64" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JYuniform64" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jiny2048@gmail.com" title="E-Mail → mailto:jiny2048@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备20010232号 </a>
+      <img src="https://img.imgdb.cn/item/5e5a92ac6127cc071359d9fd.png" style="display: inline-block;"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011302002376" rel="noopener" target="_blank">粤公网安备 44011302002376号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">uniform64</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">68k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : '0betwlWUa9lqO4RehohBtxrL-MdYXbMMI',
+      appKey     : 'BEK6xsox1P9icK3mXrYx7b3j',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
