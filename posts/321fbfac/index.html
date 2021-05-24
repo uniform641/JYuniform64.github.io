@@ -18,30 +18,30 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"jyuniform64.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"uniform64.xyz","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="0x00 前言 借着移动网络安全这门公选课的契机开始学习网络安全（我一个网络安全专业的学生竟然从公选课才能学习到专业知识QAQ），先从最基本的ARP欺骗学起吧。  0x01 ARP协议是干什么的 Address Resolution Protocol（地址解析协议），用来将IP地址转换为MAC地址，使网络适配器可以根据数据报报头的IP地址填入MAC地址，从而完成帧的封装与发送。  那么ARP是如何">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【网络安全】ARP欺骗">
-<meta property="og:url" content="https://jyuniform64.github.io/posts/321fbfac/index.html">
+<meta property="og:url" content="https://uniform64.xyz/posts/321fbfac/index.html">
 <meta property="og:site_name" content="uniform64&#39;s blog">
 <meta property="og:description" content="0x00 前言 借着移动网络安全这门公选课的契机开始学习网络安全（我一个网络安全专业的学生竟然从公选课才能学习到专业知识QAQ），先从最基本的ARP欺骗学起吧。  0x01 ARP协议是干什么的 Address Resolution Protocol（地址解析协议），用来将IP地址转换为MAC地址，使网络适配器可以根据数据报报头的IP地址填入MAC地址，从而完成帧的封装与发送。  那么ARP是如何">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post1.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post2.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post3.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post4.png">
-<meta property="og:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post5.png">
+<meta property="og:image" content="https://uniform64.xyz/posts/321fbfac/images/post1.png">
+<meta property="og:image" content="https://uniform64.xyz/posts/321fbfac/images/post2.png">
+<meta property="og:image" content="https://uniform64.xyz/posts/321fbfac/images/post3.png">
+<meta property="og:image" content="https://uniform64.xyz/posts/321fbfac/images/post4.png">
+<meta property="og:image" content="https://uniform64.xyz/posts/321fbfac/images/post5.png">
 <meta property="article:published_time" content="2020-10-05T05:34:56.000Z">
 <meta property="article:modified_time" content="2021-04-12T15:23:36.165Z">
 <meta property="article:author" content="uniform64">
 <meta property="article:tag" content="网络安全">
 <meta property="article:tag" content="ARP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://jyuniform64.github.io/posts/321fbfac/images/post1.png">
+<meta name="twitter:image" content="https://uniform64.xyz/posts/321fbfac/images/post1.png">
 
-<link rel="canonical" href="https://jyuniform64.github.io/posts/321fbfac/">
+<link rel="canonical" href="https://uniform64.xyz/posts/321fbfac/">
 
 
 <script id="page-configurations">
@@ -56,6 +56,15 @@
 
   <title>【网络安全】ARP欺骗 | uniform64's blog</title>
   
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154856350-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-154856350-1');
+      }
+    </script>
 
 
 
@@ -180,7 +189,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jyuniform64.github.io/posts/321fbfac/">
+    <link itemprop="mainEntityOfPage" href="https://uniform64.xyz/posts/321fbfac/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -332,7 +341,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://jyuniform64.github.io/posts/321fbfac/" title="【网络安全】ARP欺骗">https://jyuniform64.github.io/posts/321fbfac/</a>
+    <a href="https://uniform64.xyz/posts/321fbfac/" title="【网络安全】ARP欺骗">https://uniform64.xyz/posts/321fbfac/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
